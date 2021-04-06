@@ -66,6 +66,12 @@
 #include "../messages/IEEE802154eMACHeader.h"
 #include "../messages/MACCommand.h"
 
+#ifdef INET_DSME_VANILLA
+#define OFFSET 0
+#else
+#define OFFSET 24
+#endif
+
 namespace dsme {
 
 BeaconManager::BeaconManager(DSMELayer& dsme)
@@ -354,7 +360,7 @@ bool BeaconManager::handleEnhancedBeacon(IDSMEMessage* msg, DSMEPANDescriptor& d
     // -2 symbols for SFD
     uint32_t offset = descr.getTimeSyncSpec().getBeaconOffsetTimestampMicroSeconds() / aSymbolDuration;
     lastKnownBeaconIntervalStart = msg->getStartOfFrameDelimiterSymbolCounter() -
-                                   lastHeardBeaconSDIndex * aNumSuperframeSlots * dsme.getMAC_PIB().helper.getSymbolsPerSlot() - 8 - 2 - offset;
+                                   lastHeardBeaconSDIndex * aNumSuperframeSlots * dsme.getMAC_PIB().helper.getSymbolsPerSlot() - 8 - 2 - offset + OFFSET;
 
     // Coordinator device request free beacon slots
     LOG_DEBUG("Checking if beacon has to be allocated: "
