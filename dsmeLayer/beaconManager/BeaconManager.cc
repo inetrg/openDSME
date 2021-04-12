@@ -66,7 +66,7 @@
 #include "../messages/IEEE802154eMACHeader.h"
 #include "../messages/MACCommand.h"
 
-#ifndef LORA_SYMBOL_TYME
+#ifndef LORA_SYMBOL_TIME
 #define OFFSET 0
 #else
 #define OFFSET 24
