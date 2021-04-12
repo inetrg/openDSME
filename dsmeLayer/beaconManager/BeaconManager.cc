@@ -66,7 +66,7 @@
 #include "../messages/IEEE802154eMACHeader.h"
 #include "../messages/MACCommand.h"
 
-#ifdef INET_DSME_VANILLA
+#ifndef LORA_SYMBOL_TYME
 #define OFFSET 0
 #else
 #define OFFSET 24

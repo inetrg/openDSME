@@ -68,7 +68,7 @@ constexpr uint16_t aLeipDelayTime{815};
 constexpr uint8_t aCcaTime{8};
 
 /** CUSTOM-ATTRIBUTE: The duration of one symbol in microseconds */
-#ifdef INET_DSME_VANILLA
+#ifndef LORA_SYMBOL_TIME
 constexpr uint8_t aSymbolDuration{16};
 #else
 constexpr int aSymbolDuration{1024};
