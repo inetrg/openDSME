@@ -42,7 +42,7 @@
 
 #include "./ACTUpdater.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../mac_services/dataStructures/DSMESABSpecification.h"
 #include "../../mac_services/pib/MAC_PIB.h"
 #include "../DSMELayer.h"

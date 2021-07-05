@@ -42,7 +42,7 @@
 
 #include "./ScanHelper.h"
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../dsmeLayer/DSMELayer.h" // TODO: remove cross-layer reference
 #include "../interfaces/IDSMEPlatform.h"
 #include "../mac_services/DSME_Common.h"

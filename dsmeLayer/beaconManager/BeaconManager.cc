@@ -44,7 +44,7 @@
 
 #include "./BeaconManager.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../helper/DSMEDelegate.h"
 #include "../../interfaces/IDSMEMessage.h"
 #include "../../interfaces/IDSMEPlatform.h"

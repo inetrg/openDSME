@@ -44,7 +44,7 @@
 
 #include "./DSMEAllocationCounterTable.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../dsmeLayer/DSMELayer.h"
 #include "../../helper/Integers.h"
 #include "../DSME_Common.h"

@@ -42,7 +42,7 @@
 
 #include "./MessageHelper.h"
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../dsmeLayer/DSMELayer.h" // TODO: remove cross-layer reference
 #include "../interfaces/IDSMEMessage.h"
 #include "../mac_services/dataStructures/PANDescriptor.h"

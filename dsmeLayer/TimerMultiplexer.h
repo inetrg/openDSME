@@ -43,7 +43,7 @@
 #ifndef TIMERMULTIPLEXER_H_
 #define TIMERMULTIPLEXER_H_
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../helper/DSMEAtomic.h"
 #include "../helper/Integers.h"
 #include "./EventHistory.h"

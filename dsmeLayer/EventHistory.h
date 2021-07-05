@@ -43,7 +43,7 @@
 #ifndef EVENTHISTORY_H_
 #define EVENTHISTORY_H_
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../helper/Integers.h"
 
 namespace dsme {

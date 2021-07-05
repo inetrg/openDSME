@@ -42,7 +42,7 @@
 
 #include "./PIBHelper.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../MacDataStructures.h"
 #include "./MAC_PIB.h"
 #include "./PHY_PIB.h"

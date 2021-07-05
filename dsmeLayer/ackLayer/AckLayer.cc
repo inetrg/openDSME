@@ -42,7 +42,7 @@
 
 #include "./AckLayer.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../helper/DSMEAtomic.h"
 #include "../../helper/DSMEDelegate.h"
 #include "../../helper/DSMEFSM.h"

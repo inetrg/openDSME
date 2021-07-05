@@ -43,7 +43,7 @@
 #ifndef DSMELAYER_H_
 #define DSMELAYER_H_
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../helper/DSMEDelegate.h"
 #include "../helper/DSMEFSM.h"
 #include "../helper/Integers.h"

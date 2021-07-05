@@ -42,7 +42,7 @@
 
 #include "./GTSHelper.h"
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../dsmeLayer/DSMELayer.h" // TODO: remove cross-layer reference
 #include "../helper/DSMEDelegate.h"
 #include "../interfaces/IDSMEPlatform.h"
