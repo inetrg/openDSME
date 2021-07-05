@@ -42,7 +42,7 @@
 
 #include "./ScanHelper.h"
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../dsmeLayer/DSMELayer.h" // TODO: remove cross-layer reference
 #include "../interfaces/IDSMEPlatform.h"
 #include "../mac_services/DSME_Common.h"
@@ -88,6 +88,7 @@ void ScanHelper::startScan() {
 
     mlme_sap::SCAN::request_parameters params;
 
+#if 0
     uint16_t random_value = this->dsmeAdaptionLayer.getDSME().getPlatform().getRandom() % 128;
     if(((uint16_t) this->passiveScanCounter) > random_value) {
         LOG_INFO("Initiating enhanced active scan");
@@ -96,6 +97,9 @@ void ScanHelper::startScan() {
         LOG_INFO("Initiating passive scan");
         params.scanType = ScanType::PASSIVE;
     }
+#endif
+    LOG_INFO("Initiating passive scan");
+    params.scanType = ScanType::PASSIVE;
     this->passiveScanCounter++;
 
     params.scanChannels = scanChannels;
@@ -143,6 +147,7 @@ void ScanHelper::handleBEACON_NOTIFY_indication(mlme_sap::BEACON_NOTIFY_indicati
     }
 
     // TODO CROSS-LAYER-CALLS, no interface for this information
+#if 0
     LOG_INFO("Checking whether to become a coordinator: "
              << "isAssociated:" << this->dsmeAdaptionLayer.getMAC_PIB().macAssociatedPANCoord << ", isCoordinator:"
              << this->dsmeAdaptionLayer.getMAC_PIB().macIsCoord << ", numHeardCoordinators:" << ((uint16_t)heardCoordinators.getLength()) << ".");
@@ -162,6 +167,7 @@ void ScanHelper::handleBEACON_NOTIFY_indication(mlme_sap::BEACON_NOTIFY_indicati
             DSME_ASSERT(confirm_params.status == StartStatus::SUCCESS);
         }
     }
+#endif
 
     return;
 }

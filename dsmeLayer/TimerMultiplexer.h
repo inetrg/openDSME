@@ -43,11 +43,12 @@
 #ifndef TIMERMULTIPLEXER_H_
 #define TIMERMULTIPLEXER_H_
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../helper/DSMEAtomic.h"
 #include "../helper/Integers.h"
 #include "./EventHistory.h"
 #include "./TimerAbstractions.h"
+#include <stdio.h>
 
 #ifdef STATISTICS_MONITOR_LATENESS
 #define BIN_COUNT (16)
@@ -65,13 +66,13 @@ protected:
 
     TimerMultiplexer(R* instance, ReadonlyTimerAbstraction<G>& now, WriteonlyTimerAbstraction<S>& timer)
         : lastDispatchSymbolCounter(0), currentDispatchSymbolCounter(0), instance(instance), _NOW(now), _TIMER(timer) {
-        for(uint8_t i = 0; i < timer_t::TIMER_COUNT; ++i) {
+        for(uint8_t i = 0; i < timer_t::DSME_TIMER_COUNT; ++i) {
             this->symbols_until[i] = -1;
             this->handlers[i] = nullptr;
         }
 
 #ifdef STATISTICS_MONITOR_LATENESS
-        for(uint8_t i = 0; i < timer_t::TIMER_COUNT; ++i) {
+        for(uint8_t i = 0; i < timer_t::DSME_TIMER_COUNT; ++i) {
             for(uint16_t j = 0; j < BIN_COUNT; ++j) {
                 this->lateness_histogram[i][j] = 0;
             }
@@ -88,7 +89,7 @@ protected:
         wasReset = true;
 
         this->lastDispatchSymbolCounter = _NOW;
-        for(uint8_t i = 0; i < timer_t::TIMER_COUNT; ++i) {
+        for(uint8_t i = 0; i < timer_t::DSME_TIMER_COUNT; ++i) {
             this->symbols_until[i] = -1;
             this->handlers[i] = nullptr;
         }
@@ -111,6 +112,7 @@ protected:
         if(nextEventSymbolCounter <= this->currentDispatchSymbolCounter) {
             /* '-> an event was scheduled too far in the past */
             uint32_t now = _NOW;
+            (void) now;
             LOG_ERROR("now:" << now << ", nextEvent: " << nextEventSymbolCounter << ", lastDispatch: " << this->lastDispatchSymbolCounter << ", Event "
                              << (uint16_t)E);
             history.printEvents();
@@ -131,7 +133,7 @@ protected:
     void _scheduleTimer() {
         uint32_t symsUntilNextEvent = UINT32_MAX;
 
-        for(uint8_t i = 0; i < timer_t::TIMER_COUNT; ++i) {
+        for(uint8_t i = 0; i < timer_t::DSME_TIMER_COUNT; ++i) {
             if(0 < this->symbols_until[i] && static_cast<uint32_t>(this->symbols_until[i]) < symsUntilNextEvent) {
                 symsUntilNextEvent = symbols_until[i];
             }
@@ -149,6 +151,9 @@ protected:
         }
         _TIMER = timer;
 
+        /* HACK! */
+        return;
+
         uint32_t now = _NOW;
         if(timer <= now) {
             LOG_ERROR("now: " << now << " timer: " << timer);
@@ -165,7 +170,7 @@ private:
         /* The difference also works if there was a wrap around since lastSymCnt (modulo by casting to uint32_t). */
         int32_t symbolsSinceLastDispatch = (uint32_t)(currentDispatchSymbolCounter - this->lastDispatchSymbolCounter);
 
-        for(uint8_t i = 0; i < timer_t::TIMER_COUNT; ++i) {
+        for(uint8_t i = 0; i < timer_t::DSME_TIMER_COUNT; ++i) {
             if(0 < this->symbols_until[i] && this->symbols_until[i] <= symbolsSinceLastDispatch) {
                 int32_t lateness = symbolsSinceLastDispatch - this->symbols_until[i];
                 DSME_ASSERT(this->handlers[i] != nullptr);
@@ -188,7 +193,7 @@ private:
             }
         }
 
-        for(uint8_t i = 0; i < timer_t::TIMER_COUNT; ++i) {
+        for(uint8_t i = 0; i < timer_t::DSME_TIMER_COUNT; ++i) {
             if(this->symbols_until[i] > 0) {
                 this->symbols_until[i] -= symbolsSinceLastDispatch;
             }
@@ -211,12 +216,12 @@ private:
      * Values >  0: timer is activated
      * Values <= 0: timer has expired or is deactivated
      */
-    int32_t symbols_until[timer_t::TIMER_COUNT];
+    int32_t symbols_until[timer_t::DSME_TIMER_COUNT];
 
     /**
      * Stores handles to methods of a subclass that get called once their associated timer expires
      */
-    handler_t handlers[timer_t::TIMER_COUNT];
+    handler_t handlers[timer_t::DSME_TIMER_COUNT];
 
     /**
      * Handle to the instance of the TimerMultiplexer as the subclass which implements the handlers
@@ -240,7 +245,7 @@ private:
 
 #ifdef STATISTICS_MONITOR_LATENESS
 public:
-    uint16_t lateness_histogram[timer_t::TIMER_COUNT][BIN_COUNT];
+    uint16_t lateness_histogram[timer_t::DSME_TIMER_COUNT][BIN_COUNT];
 #endif
 };
 

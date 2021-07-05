@@ -42,8 +42,8 @@
 
 #include "./MessageDispatcher.h"
 
-#include "../../../dsme_platform.h"
-#include "../../../dsme_settings.h"
+#include "opendsme/dsme_platform.h"
+#include "opendsme/dsme_settings.h"
 #include "../../helper/DSMEDelegate.h"
 #include "../../helper/Integers.h"
 #include "../../interfaces/IDSMEMessage.h"
@@ -441,9 +441,9 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
     } else if(nextSlot == 1) {
         /* '-> next slot will be CAP */
 
-        if(!this->dsme.getMAC_PIB().macCapReduction || nextSuperframe == 0) {
+        if((!this->dsme.getMAC_PIB().macCapReduction || nextSuperframe == 0)
+                && this->dsme.getPlatform().isRxEnabledOnCap()) {
             /* '-> active CAP slot */
-
             this->dsme.getPlatform().turnTransceiverOn();
             this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
         } else {

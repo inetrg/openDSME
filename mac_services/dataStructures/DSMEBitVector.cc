@@ -46,7 +46,7 @@
 
 #include "./Serializer.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 
 namespace dsme {
 

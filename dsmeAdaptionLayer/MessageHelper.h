@@ -43,7 +43,7 @@
 #ifndef MESSAGEHELPER_H_
 #define MESSAGEHELPER_H_
 
-#include "../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "../helper/DSMEDelegate.h"
 #include "../helper/DSMERingbuffer.h"
 #include "../mac_services/DSME_Common.h"
@@ -84,6 +84,8 @@ public:
     void startAssociation();
     void handleAssociationComplete(AssociationStatus::Association_Status status);
     void handleScanAndSyncComplete(PANDescriptor* panDescriptor);
+    void setGTSTransmission(bool gts);
+    void setAckReq(bool ackReq);
 
 private:
     void handleDataConfirm(mcps_sap::DATA_confirm_parameters& params);
@@ -101,6 +103,8 @@ private:
 
     bool scanOrSyncInProgress;
     bool associationInProgress;
+    bool gtsTx;
+    bool ackReq;
 
     DSMERingBuffer<DSMEAdaptionLayerBufferEntry, UPPER_LAYER_QUEUE_SIZE> retryBuffer;
 };

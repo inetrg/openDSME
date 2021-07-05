@@ -43,7 +43,7 @@
 #ifndef ASSOCIATIONMANAGER_H_
 #define ASSOCIATIONMANAGER_H_
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../helper/Integers.h"
 #include "../../mac_services/DSME_Common.h"
 #include "../../mac_services/mlme_sap/ASSOCIATE.h"

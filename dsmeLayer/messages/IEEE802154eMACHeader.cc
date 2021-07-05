@@ -42,7 +42,7 @@
 
 #include "./IEEE802154eMACHeader.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../helper/Integers.h"
 #include "../../mac_services/DSME_Common.h"
 #include "../../mac_services/dataStructures/IEEE802154MacAddress.h"

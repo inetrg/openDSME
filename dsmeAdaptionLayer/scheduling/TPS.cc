@@ -43,7 +43,7 @@
 #include "./TPS.h"
 
 #include <cmath>
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../dsmeLayer/DSMELayer.h"
 #include "../../mac_services/dataStructures/IEEE802154MacAddress.h"
 #include "../../mac_services/pib/MAC_PIB.h"

@@ -45,7 +45,7 @@
 
 #include "./StaticScheduling.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../dsmeLayer/DSMELayer.h"
 #include "../../mac_services/dataStructures/IEEE802154MacAddress.h"
 #include "../../mac_services/pib/MAC_PIB.h"
@@ -61,7 +61,21 @@ void StaticScheduling::multisuperframeEvent() {
 
     // Set priority for the right links 
     for(GTSSchedulingData &data : this->txLinks) {
-        data.slotTarget = std::count(this->addresses.begin(), this->addresses.end(), data.address);
+        int count = 0;
+        for (auto item : this->addresses) {
+
+            if (item == data.address) {
+                count++;
+            }
+        }
+#if 0
+        for (std::vector<uint16_t>::iterator i = this->addresses.begin(); i != this->addresses.end(); ++i) {
+            if (this->addresses[i] == data.address) {
+                count++;
+            }
+        }
+#endif
+        data.slotTarget = count;
     }
 
     this->newMsf = true;

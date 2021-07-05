@@ -115,7 +115,7 @@ public:
     /*
      * Signal GTS allocation or deallocation
      */
-    virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
+    virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart, uint16_t superframeID, uint8_t gtSlotID, uint8_t channel, Direction direction) {
     }
 
     /*
@@ -164,6 +164,11 @@ public:
     * Successfully sent packets per CAP
     */
    virtual void signalSuccessPacketsCAP(uint32_t packets) {
+   }
+
+   /* Whether RX should be enabled during CAP */
+   virtual bool isRxEnabledOnCap() {
+        return true;
    }
 };
 

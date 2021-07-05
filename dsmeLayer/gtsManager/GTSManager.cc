@@ -42,7 +42,7 @@
 
 #include "./GTSManager.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../helper/DSMEAtomic.h"
 #include "../../interfaces/IDSMEMessage.h"
 #include "../../interfaces/IDSMEPlatform.h"

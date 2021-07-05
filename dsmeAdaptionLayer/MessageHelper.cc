@@ -42,7 +42,7 @@
 
 #include "./MessageHelper.h"
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../dsmeLayer/DSMELayer.h" // TODO: remove cross-layer reference
 #include "../interfaces/IDSMEMessage.h"
 #include "../mac_services/dataStructures/PANDescriptor.h"
@@ -50,6 +50,7 @@
 #include "../mac_services/mlme_sap/MLME_SAP.h"
 #include "../mac_services/pib/MAC_PIB.h"
 #include "./DSMEAdaptionLayer.h"
+#include "kernel_defines.h"
 
 namespace dsme {
 
@@ -57,7 +58,9 @@ MessageHelper::MessageHelper(DSMEAdaptionLayer& dsmeAdaptionLayer)
     : dsmeAdaptionLayer(dsmeAdaptionLayer),
 
       scanOrSyncInProgress(false),
-      associationInProgress(false) {
+      associationInProgress(false),
+      gtsTx(false),
+      ackReq(false){
 }
 
 void MessageHelper::initialize() {
@@ -74,6 +77,14 @@ void MessageHelper::setIndicationCallback(indicationCallback_t callback_indicati
 void MessageHelper::setConfirmCallback(confirmCallback_t callback_confirm) {
     this->callback_confirm = callback_confirm;
     return;
+}
+
+void MessageHelper::setGTSTransmission(bool gts) {
+    this->gtsTx = gts;
+}
+
+void MessageHelper::setAckReq(bool ackReq) {
+    this->ackReq = ackReq;
 }
 
 void MessageHelper::receiveIndication(IDSMEMessage* msg) {
@@ -156,7 +167,7 @@ void MessageHelper::sendMessageDown(IDSMEMessage* msg, bool newMessage) {
 
         params.msdu = msg;
         params.msduHandle = 0; // TODO
-        params.ackTx = true;
+        params.ackTx = this->ackReq;
 
         /* TODO
         if(dsme.getDSMESettings().optimizations) {
@@ -164,7 +175,7 @@ void MessageHelper::sendMessageDown(IDSMEMessage* msg, bool newMessage) {
         }
         else {
         */
-        params.gtsTx = !dst.isBroadcast();
+        params.gtsTx = !dst.isBroadcast() && this->gtsTx;
         //}
 
         params.indirectTx = false;

@@ -42,7 +42,7 @@
 
 #include "./AssociationHelper.h"
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../mac_services/dataStructures/IEEE802154MacAddress.h"
 #include "../mac_services/mlme_sap/ASSOCIATE.h"
 #include "../mac_services/mlme_sap/DISASSOCIATE.h"

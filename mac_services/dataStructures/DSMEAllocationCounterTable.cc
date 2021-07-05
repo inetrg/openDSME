@@ -44,7 +44,7 @@
 
 #include "./DSMEAllocationCounterTable.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../dsmeLayer/DSMELayer.h"
 #include "../../helper/Integers.h"
 #include "../DSME_Common.h"
@@ -142,7 +142,7 @@ bool DSMEAllocationCounterTable::add(uint16_t superframeID, uint8_t gtSlotID, ui
     bool success = act.insert(ACTElement(superframeID, gtSlotID, channel, direction, address, state), pos);
 
     if(success) {
-        this->dsme->getPlatform().signalGTSChange(false, IEEE802154MacAddress(address));
+        this->dsme->getPlatform().signalGTSChange(false, IEEE802154MacAddress(address), superframeID, gtSlotID, channel, direction);
 
         int d = (direction == TX) ? 0 : 1;
         RBTree<uint16_t, uint16_t>::iterator numSlotIt = numAllocatedSlots[d].find(address);
@@ -168,7 +168,7 @@ void DSMEAllocationCounterTable::remove(DSMEAllocationCounterTable::iterator it)
 
     printChange("dealloc", it->superframeID, it->slotID, it->channel, it->direction, it->address);
 
-    this->dsme->getPlatform().signalGTSChange(true, IEEE802154MacAddress(it->address));
+    this->dsme->getPlatform().signalGTSChange(true, IEEE802154MacAddress(it->address), it->superframeID, it->slotID, it->channel, it->direction);
 
     DSME_ASSERT(isAllocated(superframeID, gtSlotID));
 

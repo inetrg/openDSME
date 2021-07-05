@@ -43,7 +43,7 @@
 #ifndef GTSMANAGER_H_
 #define GTSMANAGER_H_
 
-#include "../../../DSMEMessage.h"
+#include "opendsme/DSMEMessage.h"
 #include "../../helper/DSMEBufferedMultiFSM.h"
 #include "../../helper/DSMEFSM.h"
 #include "../../helper/Integers.h"

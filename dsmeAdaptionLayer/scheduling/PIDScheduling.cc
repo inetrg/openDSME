@@ -42,7 +42,7 @@
 
 #include "./PIDScheduling.h"
 
-#include "../../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "../../mac_services/dataStructures/IEEE802154MacAddress.h"
 #include "../../mac_services/pib/MAC_PIB.h"
 #include "../DSMEAdaptionLayer.h"

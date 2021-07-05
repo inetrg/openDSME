@@ -43,7 +43,7 @@
 #ifndef DSMEFSM_H_
 #define DSMEFSM_H_
 
-#include "../../dsme_platform.h"
+#include "opendsme/dsme_platform.h"
 #include "./DSMEAtomic.h"
 #include "./Integers.h"
 

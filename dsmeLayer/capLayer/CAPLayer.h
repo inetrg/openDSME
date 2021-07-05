@@ -43,7 +43,7 @@
 #ifndef CAPLAYER_H_
 #define CAPLAYER_H_
 
-#include "../../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "../../helper/DSMEBufferedFSM.h"
 #include "../../helper/DSMEFSM.h"
 #include "../../helper/DSMEQueue.h"
