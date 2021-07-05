@@ -45,7 +45,7 @@
 
 /* INCLUDES ******************************************************************/
 
-#include "../../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "../../helper/Integers.h"
 #include "../../mac_services/dataStructures/RBTree.h"
 #include "../../mac_services/dataStructures/RBTreeIterator.h"

@@ -43,7 +43,7 @@
 #include "./DSMELayer.h"
 
 #include "opendsme/dsme_platform.h"
-#include "../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "../helper/ChannelHoppingLFSR.h"
 #include "../helper/DSMEAtomic.h"
 #include "../interfaces/IDSMEPlatform.h"

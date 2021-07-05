@@ -43,7 +43,7 @@
 #include "./MessageDispatcher.h"
 
 #include "opendsme/dsme_platform.h"
-#include "../../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "../../helper/DSMEDelegate.h"
 #include "../../helper/Integers.h"
 #include "../../interfaces/IDSMEMessage.h"

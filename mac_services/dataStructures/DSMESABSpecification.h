@@ -43,7 +43,7 @@
 #ifndef DSMESABSPECIFICATION_H_
 #define DSMESABSPECIFICATION_H_
 
-#include "../../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "./DSMEBitVector.h"
 
 namespace dsme {

@@ -43,7 +43,7 @@
 #ifndef MESSAGEHELPER_H_
 #define MESSAGEHELPER_H_
 
-#include "../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "../helper/DSMEDelegate.h"
 #include "../helper/DSMERingbuffer.h"
 #include "../mac_services/DSME_Common.h"

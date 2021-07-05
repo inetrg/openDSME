@@ -43,7 +43,7 @@
 #ifndef DSMEALLOCATIONCOUNTERTABLE_H_
 #define DSMEALLOCATIONCOUNTERTABLE_H_
 
-#include "../../../dsme_settings.h"
+#include "opendsme/dsme_settings.h"
 #include "../../interfaces/IDSMEPlatform.h"
 #include "./ACTElement.h"
 #include "./DSMEBitVector.h"
