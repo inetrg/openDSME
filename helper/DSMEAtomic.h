@@ -43,7 +43,7 @@
 #ifndef DSMEATOMIC_H_
 #define DSMEATOMIC_H_
 
-#include "../../dsme_atomic.h"
+#include "opendsme/dsme_atomic.h"
 
 namespace dsme {
 
