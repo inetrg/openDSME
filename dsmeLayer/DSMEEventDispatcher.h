@@ -59,7 +59,7 @@ enum EventTimers {
     CSMA_TIMER,
     ACK_TIMER,
     IFS_TIMER,  /* IFS after dataframe transmission */
-    TIMER_COUNT /* always last element */
+    DSME_TIMER_COUNT /* always last element */
 };
 
 class DSMEEventDispatcher;
@@ -100,7 +100,7 @@ private:
 #ifdef STATISTICS_MONITOR_LATENESS
 public:
     void printLatenessHistogram() {
-        for(uint8_t i = 0; i < EventTimers::TIMER_COUNT; ++i) {
+        for(uint8_t i = 0; i < EventTimers::DSME_TIMER_COUNT; ++i) {
             LOG_ERROR_PREFIX;
             LOG_ERROR_PURE(static_cast<uint16_t>(i) << ": ");
             for(uint16_t j = 0; j < BIN_COUNT; ++j) {

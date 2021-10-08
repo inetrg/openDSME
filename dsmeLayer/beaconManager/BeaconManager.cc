@@ -161,7 +161,8 @@ void BeaconManager::preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMul
 
 void BeaconManager::superframeEvent(int32_t lateness, uint32_t currentSlotTime) {
     if(transmissionPending) {
-        if(lateness > 1) {
+        //if(lateness > 1) {
+        if(lateness > 5) {
             dsme.getAckLayer().abortPreparedTransmission();
             LOG_ERROR("Beacon aborted");
         } else {
@@ -192,13 +193,14 @@ void BeaconManager::prepareEnhancedBeacon(uint32_t nextSlotTime) {
     msg->getHeader().setSrcPANId(this->dsme.getMAC_PIB().macPANId);
     msg->getHeader().setDstPANId(this->dsme.getMAC_PIB().macPANId);
 
-    transmissionPending = true;
     if(!dsme.getAckLayer().prepareSendingCopy(msg, doneCallback)) {
         // message could not be sent
         LOG_DEBUG("Beacon could not be sent");
         dsme.getPlatform().releaseMessage(msg);
+        transmissionPending = false;
     } else {
         LOG_DEBUG("Beacon sent");
+        transmissionPending = true;
     }
 
     return;
@@ -460,8 +462,9 @@ void BeaconManager::onCSMASent(IDSMEMessage* msg, CommandFrameIdentifier cmdId, 
 void BeaconManager::sendDone(enum AckLayerResponse result, IDSMEMessage* msg) {
     dsme.getPlatform().releaseMessage(msg);
     transmissionPending = false;
-    DSME_ASSERT(result == AckLayerResponse::NO_ACK_REQUESTED || result == AckLayerResponse::SEND_FAILED);
-    DSME_SIM_ASSERT(result == AckLayerResponse::NO_ACK_REQUESTED);
+    /* NEW */
+    DSME_ASSERT(result == AckLayerResponse::NO_ACK_REQUESTED || result == AckLayerResponse::SEND_FAILED || AckLayerResponse::SEND_ABORTED);
+    //DSME_SIM_ASSERT(result == AckLayerResponse::NO_ACK_REQUESTED);
 }
 
 void BeaconManager::handleBeacon(IDSMEMessage* msg) {

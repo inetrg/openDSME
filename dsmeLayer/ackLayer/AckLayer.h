@@ -45,6 +45,7 @@
 
 #include "../../helper/DSMEBufferedFSM.h"
 #include "../../helper/DSMEDelegate.h"
+#include "../../mac_services/DSME_Common.h"
 
 namespace dsme {
 
