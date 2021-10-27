@@ -46,6 +46,7 @@
 #include "../../helper/Integers.h"
 #include "./RBNode.h"
 #include "./RBTreeIterator.h"
+#include "opendsme/dsme_platform.h"
 
 namespace dsme {
 
@@ -231,6 +232,9 @@ bool RBTree<T, K>::insert(T obj, K key) {
                 if(current->leftChild == nullptr) {
                     /* '-> has no left-side child -> current node sets his child -> position found */
                     node = new RBNode<T, K>(obj, key);
+                    if (node == nullptr) {
+                        DSME_ASSERT(false);
+                    }
                     node->parent = current;
                     current->leftChild = node;
                     break;
@@ -241,6 +245,9 @@ bool RBTree<T, K>::insert(T obj, K key) {
                 if(current->rightChild == nullptr) {
                     /* '-> has no right-side child -> current node sets his child -> position found */
                     node = new RBNode<T, K>(obj, key);
+                    if (node == nullptr) {
+                        DSME_ASSERT(false);
+                    }
                     node->parent = current;
                     current->rightChild = node;
                     break;
