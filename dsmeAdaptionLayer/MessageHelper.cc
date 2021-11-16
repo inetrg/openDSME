@@ -50,6 +50,7 @@
 #include "../mac_services/mlme_sap/MLME_SAP.h"
 #include "../mac_services/pib/MAC_PIB.h"
 #include "./DSMEAdaptionLayer.h"
+#include "kernel_defines.h"
 
 namespace dsme {
 
@@ -164,7 +165,7 @@ void MessageHelper::sendMessageDown(IDSMEMessage* msg, bool newMessage) {
         }
         else {
         */
-        params.gtsTx = !dst.isBroadcast();
+        params.gtsTx = !dst.isBroadcast() && !IS_ACTIVE(CONFIG_OPENDSME_USE_CAP);
         //}
 
         params.indirectTx = false;
