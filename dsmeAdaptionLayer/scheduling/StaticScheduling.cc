@@ -61,7 +61,21 @@ void StaticScheduling::multisuperframeEvent() {
 
     // Set priority for the right links 
     for(GTSSchedulingData &data : this->txLinks) {
-        data.slotTarget = std::count(this->addresses.begin(), this->addresses.end(), data.address);
+        int count = 0;
+        for (auto item : this->addresses) {
+
+            if (item == data.address) {
+                count++;
+            }
+        }
+#if 0
+        for (std::vector<uint16_t>::iterator i = this->addresses.begin(); i != this->addresses.end(); ++i) {
+            if (this->addresses[i] == data.address) {
+                count++;
+            }
+        }
+#endif
+        data.slotTarget = count;
     }
 
     this->newMsf = true;
