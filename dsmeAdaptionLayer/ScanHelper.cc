@@ -147,6 +147,7 @@ void ScanHelper::handleBEACON_NOTIFY_indication(mlme_sap::BEACON_NOTIFY_indicati
     }
 
     // TODO CROSS-LAYER-CALLS, no interface for this information
+#if 0
     LOG_INFO("Checking whether to become a coordinator: "
              << "isAssociated:" << this->dsmeAdaptionLayer.getMAC_PIB().macAssociatedPANCoord << ", isCoordinator:"
              << this->dsmeAdaptionLayer.getMAC_PIB().macIsCoord << ", numHeardCoordinators:" << ((uint16_t)heardCoordinators.getLength()) << ".");
@@ -166,6 +167,7 @@ void ScanHelper::handleBEACON_NOTIFY_indication(mlme_sap::BEACON_NOTIFY_indicati
             DSME_ASSERT(confirm_params.status == StartStatus::SUCCESS);
         }
     }
+#endif
 
     return;
 }
