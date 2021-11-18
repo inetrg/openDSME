@@ -157,7 +157,7 @@ void MessageHelper::sendMessageDown(IDSMEMessage* msg, bool newMessage) {
 
         params.msdu = msg;
         params.msduHandle = 0; // TODO
-        params.ackTx = true;
+        params.ackTx = IS_ACTIVE(CONFIG_DSME_PLATFORM_ACK_REQ);
 
         /* TODO
         if(dsme.getDSMESettings().optimizations) {
