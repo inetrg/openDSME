@@ -165,6 +165,11 @@ public:
     */
    virtual void signalSuccessPacketsCAP(uint32_t packets) {
    }
+
+   /* Whether RX should be enabled during CAP */
+   virtual bool isRxEnabledOnCap() {
+        return true;
+   }
 };
 
 } /* namespace dsme */
