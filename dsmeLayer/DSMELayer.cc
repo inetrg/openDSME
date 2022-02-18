@@ -204,6 +204,7 @@ void DSMELayer::preSlotEvent(void) {
 
     // proof of concept capON capOff
 
+#if 0
     else if(nextSlot == 1 && nextSuperframe == 0 && nextMultiSuperframe==0){
         LOG_DEBUG(" slot 0, SF = 0, value of switch: ");
         LOG_DEBUG(this->switchCap);
@@ -237,6 +238,7 @@ void DSMELayer::preSlotEvent(void) {
     }else if(nextSlot == 1 && currentSuperframe == 3){
         LOG_DEBUG(" slot 0, SF = 3");
     }
+#endif
 
     messageDispatcher.handlePreSlotEvent(nextSlot, nextSuperframe, nextMultiSuperframe);
 }
