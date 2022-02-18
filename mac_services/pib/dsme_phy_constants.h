@@ -71,7 +71,7 @@ constexpr uint8_t aCcaTime{8};
 #ifndef LORA_SYMBOL_TIME
 constexpr uint8_t aSymbolDuration{16};
 #else
-constexpr int aSymbolDuration{1024};
+constexpr int aSymbolDuration{1000};
 #endif
 
 } /* namespace dsme */
