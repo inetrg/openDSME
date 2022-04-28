@@ -84,6 +84,8 @@ public:
     void startAssociation();
     void handleAssociationComplete(AssociationStatus::Association_Status status);
     void handleScanAndSyncComplete(PANDescriptor* panDescriptor);
+    void setGTSTransmission(bool gts);
+    void setAckReq(bool ackReq);
 
 private:
     void handleDataConfirm(mcps_sap::DATA_confirm_parameters& params);
@@ -101,6 +103,8 @@ private:
 
     bool scanOrSyncInProgress;
     bool associationInProgress;
+    bool gtsTx;
+    bool ackReq;
 
     DSMERingBuffer<DSMEAdaptionLayerBufferEntry, UPPER_LAYER_QUEUE_SIZE> retryBuffer;
 };

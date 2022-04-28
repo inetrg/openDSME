@@ -58,7 +58,9 @@ MessageHelper::MessageHelper(DSMEAdaptionLayer& dsmeAdaptionLayer)
     : dsmeAdaptionLayer(dsmeAdaptionLayer),
 
       scanOrSyncInProgress(false),
-      associationInProgress(false) {
+      associationInProgress(false),
+      gtsTx(false),
+      ackReq(false){
 }
 
 void MessageHelper::initialize() {
@@ -75,6 +77,14 @@ void MessageHelper::setIndicationCallback(indicationCallback_t callback_indicati
 void MessageHelper::setConfirmCallback(confirmCallback_t callback_confirm) {
     this->callback_confirm = callback_confirm;
     return;
+}
+
+void MessageHelper::setGTSTransmission(bool gts) {
+    this->gtsTx = gts;
+}
+
+void MessageHelper::setAckReq(bool ackReq) {
+    this->ackReq = ackReq;
 }
 
 void MessageHelper::receiveIndication(IDSMEMessage* msg) {
@@ -157,7 +167,7 @@ void MessageHelper::sendMessageDown(IDSMEMessage* msg, bool newMessage) {
 
         params.msdu = msg;
         params.msduHandle = 0; // TODO
-        params.ackTx = IS_ACTIVE(CONFIG_DSME_PLATFORM_ACK_REQ);
+        params.ackTx = this->ackReq;
 
         /* TODO
         if(dsme.getDSMESettings().optimizations) {
@@ -165,7 +175,7 @@ void MessageHelper::sendMessageDown(IDSMEMessage* msg, bool newMessage) {
         }
         else {
         */
-        params.gtsTx = !dst.isBroadcast() && !IS_ACTIVE(CONFIG_OPENDSME_USE_CAP);
+        params.gtsTx = !dst.isBroadcast() && this->gtsTx;
         //}
 
         params.indirectTx = false;
