@@ -88,7 +88,7 @@ GTSSchedulingDecision StaticScheduling::getNextSchedulingAction(uint16_t address
             if(this->newMsf && this->addresses[i] == address) {
                 if(!this->dsmeAdaptionLayer.getMAC_PIB().macDSMEACT.isAllocated(this->superframes[i], this->slots[i])) {
                     this->newMsf = false;
-                    return GTSSchedulingDecision{address, ManagementType::ALLOCATION, Direction::TX, 1, this->superframes[i], this->slots[i]};
+                    return GTSSchedulingDecision{address, ManagementType::ALLOCATION, Direction::TX, this->numSlots[i], this->superframes[i], this->slots[i]};
                 }
             }
         }
@@ -101,7 +101,7 @@ void StaticScheduling::setNegotiateChannels(bool negotiateChannels) {
     this->negotiateChannels = negotiateChannels; 
 }
 
-void StaticScheduling::allocateGTS(uint8_t superframeID, uint8_t slotID, uint8_t channelID, Direction direction, uint16_t address) {
+void StaticScheduling::allocateGTS(uint8_t superframeID, uint8_t slotID, uint8_t channelID, Direction direction, uint16_t address, uint16_t numSlots) {
     if(!this->negotiateChannels) {
         this->dsmeAdaptionLayer.getDSME().getMessageDispatcher().addNeighbor(IEEE802154MacAddress(address));
         this->dsmeAdaptionLayer.getMAC_PIB().macDSMEACT.add(superframeID, slotID, channelID, direction, address, ACTState::VALID);
@@ -110,6 +110,7 @@ void StaticScheduling::allocateGTS(uint8_t superframeID, uint8_t slotID, uint8_t
             this->superframes.push_back(superframeID); 
             this->slots.push_back(slotID);
             this->addresses.push_back(address); 
+            this->numSlots.push_back(numSlots);
         }
     }
 }

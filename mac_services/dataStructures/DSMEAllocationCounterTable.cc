@@ -231,10 +231,10 @@ void DSMEAllocationCounterTable::setACTState(DSMESABSpecification& subBlock, ACT
 void DSMEAllocationCounterTable::setACTState(DSMESABSpecification& subBlock, ACTState state, Direction direction, uint16_t deviceAddress,
                                              uint16_t channelOffset, bool useChannelOffset, condition_t condition, bool checkAddress) {
     // Supporting more than one slot allocation induces many open issues and is probably not needed most of the time.
-    if(subBlock.getSubBlock().count(true) < 1) {
-        return;
-    }
-    DSME_ASSERT(subBlock.getSubBlock().count(true) == 1);
+    //if(subBlock.getSubBlock().count(true) < 1) {
+    //    return;
+    //}
+    //DSME_ASSERT(subBlock.getSubBlock().count(true) == 1);
 
     for(DSMESABSpecification::SABSubBlock::iterator it = subBlock.getSubBlock().beginSetBits(); it != subBlock.getSubBlock().endSetBits(); ++it) {
         // this calculation assumes there is always exactly one superframe in the subblock

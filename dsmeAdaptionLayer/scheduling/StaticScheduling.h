@@ -63,13 +63,14 @@ public:
     virtual GTSSchedulingDecision getNextSchedulingAction(uint16_t address);
 
     void setNegotiateChannels(bool negotiateChannels);    
-    void allocateGTS(uint8_t superframeID, uint8_t slotID, uint8_t channelID, Direction direction, uint16_t address);
+    void allocateGTS(uint8_t superframeID, uint8_t slotID, uint8_t channelID, Direction direction, uint16_t address, uint16_t numSlots);
 
 private:
     /* save schedule and allocate slots */
     std::vector<uint8_t> superframes;
     std::vector<uint8_t> slots; 
     std::vector<uint16_t> addresses;
+    std::vector<uint16_t> numSlots;
     bool newMsf; 
     bool negotiateChannels;
 };
