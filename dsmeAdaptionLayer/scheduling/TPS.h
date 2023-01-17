@@ -43,7 +43,7 @@
 #ifndef TPS_H_
 #define TPS_H_
 
-#include "./GTSScheduling.h"
+#include "./GTSSchedulingImpl.h"
 
 namespace dsme {
 

@@ -43,7 +43,7 @@
 #ifndef PIDSCHEDULING_H_
 #define PIDSCHEDULING_H_
 
-#include "./GTSScheduling.h"
+#include "./GTSSchedulingImpl.h"
 
 namespace dsme {
 

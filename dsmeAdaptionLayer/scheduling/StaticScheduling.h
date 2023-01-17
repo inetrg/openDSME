@@ -46,7 +46,7 @@
 #ifndef STATICSCHEDULING_H_
 #define STATICSCHEDULING_H_
 
-#include "./GTSScheduling.h"
+#include "./GTSSchedulingImpl.h"
 #include <vector>
 
 namespace dsme {
