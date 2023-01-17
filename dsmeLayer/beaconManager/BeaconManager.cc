@@ -463,7 +463,7 @@ void BeaconManager::sendDone(enum AckLayerResponse result, IDSMEMessage* msg) {
     dsme.getPlatform().releaseMessage(msg);
     transmissionPending = false;
     /* NEW */
-    DSME_ASSERT(result == AckLayerResponse::NO_ACK_REQUESTED || result == AckLayerResponse::SEND_FAILED || AckLayerResponse::SEND_ABORTED);
+    DSME_ASSERT(result == AckLayerResponse::NO_ACK_REQUESTED || result == AckLayerResponse::SEND_FAILED || result == AckLayerResponse::SEND_ABORTED);
     //DSME_SIM_ASSERT(result == AckLayerResponse::NO_ACK_REQUESTED);
 }
 
