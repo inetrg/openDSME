@@ -54,6 +54,7 @@ public:
 
     DSMESABSpecification() : subBlockIndex(0) {
     }
+    ~DSMESABSpecification() {}
 
     explicit DSMESABSpecification(uint8_t subBlockLengthBytes) : subBlockIndex(0) {
         subBlock.initialize(subBlockLengthBytes * 8);
@@ -92,6 +93,12 @@ public:
         this->subBlock = other.subBlock;
         return (*this);
     }
+
+    DSMESABSpecification(const DSMESABSpecification& other) {
+        this->subBlockIndex = other.subBlockIndex;
+        this->subBlock = other.subBlock;
+    }
+    
 
     bool operator==(const DSMESABSpecification& other) const {
         return (subBlockIndex == other.subBlockIndex) && (subBlock == other.subBlock);

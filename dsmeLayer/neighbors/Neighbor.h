@@ -61,6 +61,11 @@ struct Neighbor {
     explicit Neighbor(const Neighbor& other) : address(other.address) {
     }
 
+    Neighbor& operator=(const Neighbor& other) {
+        address = other.address;
+        return (*this);
+    }
+
     IEEE802154MacAddress address;
 };
 
