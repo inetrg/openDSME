@@ -96,6 +96,10 @@ private:
     mcps_sap::MCPS_SAP* mcps_sap;
     mlme_sap::MLME_SAP* mlme_sap;
 
+    /* helper to decide how many slots to skip before sceduling the next
+     * slotEvent */
+    uint8_t getSkippableSlots(uint16_t currentSlot, uint16_t currentSuperframe);
+
 public:
     PHY_PIB& getPHY_PIB() {
         return *(phy_pib);

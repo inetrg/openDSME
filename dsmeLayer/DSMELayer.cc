@@ -187,6 +187,60 @@ void DSMELayer::preSlotEvent(void) {
     messageDispatcher.handlePreSlotEvent(nextSlot, nextSuperframe, nextMultiSuperframe);
 }
 
+uint8_t DSMELayer::getSkippableSlots(uint16_t currentSlot, uint16_t currentSuperframe) {
+#if DSME_MINIMIZE_CFP_SLOT_EVENTS == 0
+    /* whithout slot minimization, just CAP slots are skipped */
+    uint8_t skippedSlots = 0;
+    if(currentSlot == 1) { // beginning of CAP
+        if(this->mac_pib->macCapReduction && currentSuperframe > 0) {
+            // no CAP available
+            skippedSlots = 0;
+        } else {
+            // no (pre) slot events required during CAP
+            skippedSlots = 7;
+        }
+    }
+    return skippedSlots;
+#else
+    /* whith slot minimization, identify which is the next slot that requires action
+     * and skip all slots till then */
+    DSMEAllocationCounterTable& act = getMAC_PIB().macDSMEACT;
+    uint8_t offset = 1;
+    unsigned SFperMSF = getMAC_PIB().helper.getNumberSuperframesPerMultiSuperframe();
+    /* iterate over all upcoming slots till we find one that requires action */
+    while (true) {
+      uint8_t ns = (currentSlot + offset) % 16;
+      uint16_t nSF = currentSuperframe;
+      if (ns < currentSlot) {
+        /* wrap araound to next SF */
+        nSF = (nSF + 1) % SFperMSF;
+      }
+      if (ns == 0) { /* beacon slot */
+        break;
+      } else if ((ns == 1)) { /* (potentially) start of CAP */
+        if (!getMAC_PIB().macCapReduction || (nSF == 0)) {
+          /* '-> next superframe contains a CAP phase -> skip there */
+          break;
+        }
+      } else if (ns == (getMAC_PIB().helper.getFinalCAPSlot(currentSuperframe) + 1)) {
+          /* always wakeup for the first CFP slot to handle radio powerdown
+           * and startOfCFPEvent properly */
+          break;
+      }
+      /* if next slot is is GTS slot -> check if it is allocated.. */
+      if (ns > getMAC_PIB().helper.getFinalCAPSlot(currentSuperframe)) {
+        unsigned gtsid = ns - getMAC_PIB().helper.getFinalCAPSlot(currentSuperframe) - 1;
+        if (act.isAllocated(currentSuperframe, gtsid)) {
+          /* ... and schedule delayed wakeup for next allocated GTS */
+          break;
+        }
+      }
+      offset++;
+    }
+    return offset - 1;
+#endif
+}
+
 void DSMELayer::slotEvent(int32_t lateness) {
     if(resetPending) {
         doReset();
@@ -217,17 +271,7 @@ void DSMELayer::slotEvent(int32_t lateness) {
         currentSlotTime = this->nextSlotTime;
     }
 
-    uint8_t skippedSlots = 0;
-    if(currentSlot == 1) { // beginning of CAP
-        if(this->mac_pib->macCapReduction && currentSuperframe > 0) {
-            // no CAP available
-            skippedSlots = 0;
-        } else {
-            // no (pre) slot events required during CAP
-            skippedSlots = 7;
-        }
-    }
-
+    uint8_t skippedSlots = getSkippableSlots(currentSlot, currentSuperframe);
     this->nextSlotTime = eventDispatcher.setupSlotTimer(currentSlotTime, skippedSlots);
 
     /* handle slot */
