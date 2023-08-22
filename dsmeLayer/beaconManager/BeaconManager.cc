@@ -152,7 +152,12 @@ void BeaconManager::preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMul
         this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
         prepareEnhancedBeacon(startSlotTime);
     } else if((!dsme.getMAC_PIB().macAssociatedPANCoord) || nextSDIndex == this->dsme.getMAC_PIB().macSyncParentSdIndex) {
-        // This node expects a beacon, only if not associated or a beacon from the SYNC-parent is expected
+        /* This node expects a beacon, only if not associated or a beacon from the SYNC-parent is expected.
+         * Update the receive delegate accordingly.
+         */
+        if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
+            this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&BeaconManager::onReceive, this->dsme.getBeaconManager()));
+        }
         this->dsme.getPlatform().turnTransceiverOn();
         this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
         this->dsme.getPlatform().turnTransceiverToRX();
@@ -534,6 +539,8 @@ void BeaconManager::handleBeacon(IDSMEMessage* msg) {
 
         this->dsme.getMAC_PIB().macPanCoordinatorBsn = params.ebsn;
         if (this->dsme.isTrackingBeacons()) {
+          /* enable the CAP delegate ASAP after starting tracking so it will receive commands */
+          this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&CAPLayer::onReceive, this->dsme.getCapLayer()));
           this->_isSynced = true;
         }
         this->dsme.getMLME_SAP().getBEACON_NOTIFY().notify_indication(params);
@@ -669,6 +676,7 @@ void BeaconManager::handleStartOfCFP(uint16_t currentSuperframe, uint16_t curren
             params.keySource = nullptr;
             params.keyIndex = 0;
             this->_isSynced = false;
+            this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&BeaconManager::onReceive, this->dsme.getBeaconManager()));
 
             this->dsme.stopTrackingBeacons();
 

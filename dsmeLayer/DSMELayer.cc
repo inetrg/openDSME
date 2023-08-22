@@ -83,7 +83,10 @@ DSMELayer::DSMELayer()
 void DSMELayer::initialize(IDSMEPlatform* platform) {
     this->platform = platform;
 
-    this->platform->setReceiveDelegate(DELEGATE(&MessageDispatcher::receive, this->messageDispatcher));
+    /* only beacons are expected in the beginning.
+     * Once the MAC is synchronized the receive delegate is switched to the CAP
+     * layer, which also handles (forwards) MAC commands for association */
+    platform->setReceiveDelegate(DELEGATE(&BeaconManager::onReceive, beaconManager));
 
     this->currentSlot = 0;
     this->currentSuperframe = 0;

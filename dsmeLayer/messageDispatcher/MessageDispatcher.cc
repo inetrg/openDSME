@@ -343,6 +343,9 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
 
     if(nextSlot > this->dsme.getMAC_PIB().helper.getFinalCAPSlot(nextSuperframe)) {
         /* '-> next slot will be GTS */
+        if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
+            this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&MessageDispatcher::onReceive, *this));
+        }
 
         unsigned nextGTS = nextSlot - (this->dsme.getMAC_PIB().helper.getFinalCAPSlot(nextSuperframe) + 1);
         if(act.isAllocated(nextSuperframe, nextGTS)) {
@@ -382,15 +385,20 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
         DSME_ASSERT(this->currentACTElement == act.end());
     } else if(nextSlot == 1) {
         /* '-> next slot will be CAP */
-
         if((!this->dsme.getMAC_PIB().macCapReduction || nextSuperframe == 0)
                 && this->dsme.getPlatform().isRxEnabledOnCap()) {
             /* '-> active CAP slot */
+            if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
+                this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&CAPLayer::onReceive, this->dsme.getCapLayer()));
+            }
             this->dsme.getPlatform().turnTransceiverOn();
             this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
             this->dsme.getPlatform().turnTransceiverToRX();
         } else {
             /* '-> CAP reduction */
+            if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
+                this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&MessageDispatcher::onReceive, *this));
+            }
             transceiverOffIfAssociated();
         }
     }
