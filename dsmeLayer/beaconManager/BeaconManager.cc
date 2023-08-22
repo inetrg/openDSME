@@ -657,15 +657,6 @@ void BeaconManager::handleStartOfCFP(uint16_t currentSuperframe, uint16_t curren
     return;
 }
 
-void BeaconManager::scanCurrentChannel() {
-    this->dsme.getPlatform().setChannelNumber(this->currentScanChannel);
-
-    sendEnhancedBeaconRequest();
-
-    this->superframesLeftForScan = this->superframesForEachChannel;
-    return;
-}
-
 void BeaconManager::channelScanPassiveComplete() {
     DSME_ASSERT(this->scanning);
 
