@@ -223,6 +223,8 @@ fsmReturnStatus AckLayer::stateIdle(AckEvent& event) {
                 }
             }
 
+            dsme.getPlatform().turnTransceiverToIdle();
+
             if(dsme.getPlatform().prepareSendingCopy(pendingMessage, internalDoneCallback)) {
                 return transition(&AckLayer::statePreparingTx);
             } else {
@@ -267,6 +269,7 @@ fsmReturnStatus AckLayer::stateIdle(AckEvent& event) {
 
                 ackHeader.setDstAddr(receivedMessage->getHeader().getSrcAddr()); // TODO remove, this is only for the sequence diagram
 
+                dsme.getPlatform().turnTransceiverToIdle();
                 /* platform has to handle delaying the ACK to obey aTurnaroundTime */
                 bool success = dsme.getPlatform().sendDelayedAck(pendingMessage, receivedMessage, internalDoneCallback);
 
@@ -336,6 +339,7 @@ fsmReturnStatus AckLayer::stateTx(AckEvent& event) {
                     // has to be set 5.3.11.5.2)
                     // unless an acknowledgment shall be sent from an upper layer (can not be interfered from the standard)
 
+                    dsme.getPlatform().turnTransceiverToRX();
                     return transition(&AckLayer::stateWaitForAck);
                 } else {
                     signalResult(NO_ACK_REQUESTED);

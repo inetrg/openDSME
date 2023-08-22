@@ -224,6 +224,8 @@ fsmReturnStatus CAPLayer::stateIdle(CSMAEvent& event) {
         totalNBs = 0;
         CW = CW0;
 
+        dsme.getPlatform().turnTransceiverToRX();
+
         if(!queue.empty()) {
             return transition(&CAPLayer::stateBackoff);
         } else {

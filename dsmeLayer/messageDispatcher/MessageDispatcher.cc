@@ -353,10 +353,10 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
             // For TX currentACTElement will be reset in finalizeGTSTransmission, called by
             // either handleGTS if nothing is to send or by sendDoneGTS.
             // For RX it is reset in the next handlePreSlotEvent.   TODO: is the reset actually required?
+            this->dsme.getPlatform().turnTransceiverOn();
 
             // For RX also if INVALID or UNCONFIRMED!
             if((this->currentACTElement->getState() == VALID) || (this->currentACTElement->getDirection() == Direction::RX)) {
-                this->dsme.getPlatform().turnTransceiverOn();
 
                 if(dsme.getMAC_PIB().macChannelDiversityMode == Channel_Diversity_Mode::CHANNEL_ADAPTATION) {
                     this->dsme.getPlatform().setChannelNumber(this->dsme.getMAC_PIB().helper.getChannels()[this->currentACTElement->getChannel()]);
@@ -364,12 +364,14 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
                     uint8_t channel = nextHoppingSequenceChannel(nextSlot, nextSuperframe, nextMultiSuperframe);
                     this->dsme.getPlatform().setChannelNumber(channel);
                 }
+
+                if (this->currentACTElement->getDirection() == Direction::RX) {
+                    this->dsme.getPlatform().turnTransceiverToRX();
+                    // statistic - gets decremented on actual reception
+                    this->numUnusedRxGts++;
+                }
             }
 
-            // statistic
-            if(this->currentACTElement->getDirection() == RX) {
-                this->numUnusedRxGts++; // gets PURGE.cc decremented on actual reception
-            }
         } else {
             /* '-> nothing to do during this slot */
             DSME_ASSERT(this->currentACTElement == act.end());
@@ -386,6 +388,7 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
             /* '-> active CAP slot */
             this->dsme.getPlatform().turnTransceiverOn();
             this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
+            this->dsme.getPlatform().turnTransceiverToRX();
         } else {
             /* '-> CAP reduction */
             transceiverOffIfAssociated();

@@ -155,6 +155,7 @@ void BeaconManager::preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMul
         // This node expects a beacon, only if not associated or a beacon from the SYNC-parent is expected
         this->dsme.getPlatform().turnTransceiverOn();
         this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
+        this->dsme.getPlatform().turnTransceiverToRX();
     } else {
         this->dsme.getPlatform().turnTransceiverOff();
     }
@@ -626,6 +627,7 @@ void BeaconManager::startScanPassive(uint16_t scanDuration, const channelList_t&
 
     this->dsme.getPlatform().turnTransceiverOn();
     this->dsme.getPlatform().setChannelNumber(this->scanChannels[this->currentScanChannelIndex]);
+    this->dsme.getPlatform().turnTransceiverToRX();
     this->superframesLeftForScan = this->superframesForEachChannel;
 }
 
@@ -706,7 +708,9 @@ void BeaconManager::channelScanPassiveComplete() {
     } else {
         LOG_INFO("Check next");
         this->currentScanChannelIndex++;
+        this->dsme.getPlatform().turnTransceiverToIdle();
         this->dsme.getPlatform().setChannelNumber(this->scanChannels[this->currentScanChannelIndex]);
+        this->dsme.getPlatform().turnTransceiverToRX();
         this->superframesLeftForScan = this->superframesForEachChannel;
     }
     return;
@@ -746,8 +750,10 @@ void BeaconManager::channelScanEnhancedActiveComplete() {
         this->dsme.getMLME_SAP().getSCAN().notify_confirm(params);
     } else {
         this->currentScanChannelIndex++;
+        this->dsme.getPlatform().turnTransceiverToIdle();
         this->dsme.getPlatform().setChannelNumber(this->scanChannels[this->currentScanChannelIndex]);
         this->sendEnhancedBeaconRequest();
+        this->dsme.getPlatform().turnTransceiverToRX();
         this->superframesLeftForScan = this->superframesForEachChannel;
     }
     return;

@@ -96,12 +96,24 @@ public:
     virtual bool startCCA() = 0;
 
     /**
-     * Turn the transceiver on
+     * Turn the transceiver on (wakeup from low-power)
      */
     virtual void turnTransceiverOn() = 0;
+    
+    /**
+     * Turn the transceiver to idle mode.
+     * Radio will be awake (high power mode).
+     * Radio will not receive any packets in this mode.
+     */
+    virtual void turnTransceiverToIdle() = 0;
 
     /**
-     * Turn the transceiver off
+     * Turn the transceiver to RX mode
+     */
+    virtual void turnTransceiverToRX() = 0;
+
+    /**
+     * Turn the transceiver off (set to low-power)
      */
     virtual void turnTransceiverOff() = 0;
 };

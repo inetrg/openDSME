@@ -61,7 +61,9 @@ ASSOCIATE::ASSOCIATE(DSMELayer& dsme) : dsme(dsme) {
 /* IEEE802.15.4-2011 6.2.2.1 */
 void ASSOCIATE::request(request_parameters& params) {
     // update PHY and MAC PIB attributes
+    dsme.getPlatform().turnTransceiverOn();
     dsme.getPlatform().setChannelNumber(params.channelNumber); // TODO Move -> AssociationManager
+    dsme.getPlatform().turnTransceiverToRX();
     dsme.getPHY_PIB().phyCurrentPage = params.channelPage;
     dsme.getMAC_PIB().macPANId = params.coordPanId;
     if(params.coordAddrMode == AddrMode::SHORT_ADDRESS) {
