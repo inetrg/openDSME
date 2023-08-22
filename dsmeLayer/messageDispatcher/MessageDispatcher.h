@@ -149,9 +149,11 @@ public:
     void sendDoneGTS(enum AckLayerResponse response, IDSMEMessage* msg);
 
     /**
-     * TODO: this should be relocated to the entity actually responsible for GTS
-     * This shall be called to receive a message after it has been decoupled from
-     * the ISR control flow.
+     * This shall be called to hand over a received GTS message after it has been
+     * decoupled from the ISR control flow.
+     *
+     * TODO: this should be relocated to a separate entity responsible for GTS.
+     *       (as is also the case for CAP Layer and BeaconManager).
      *
      * \param msg The message to received
      */
