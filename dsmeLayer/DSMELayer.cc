@@ -169,8 +169,15 @@ void DSMELayer::preSlotEvent(void) {
         return;
     }
 
-    // calculate time within next slot
-    uint32_t cnt = platform->getSymbolCounter() - beaconManager.getLastKnownBeaconIntervalStart() + PRE_EVENT_SHIFT + 1;
+    uint32_t lkb = beaconManager.getLastKnownBeaconIntervalStart();
+    /* calculate a symbol counter that is within the next slot (the slot that is about to happen after
+     * this pre-slot event).
+     * Offset current symbol counter enough to also guarantee it points to the next slot even if
+     * the timer indicates a few symbols before the slot.
+     * This is needed if the timer triggers a bit too early or indicates a slightly lower time
+     * e.g. due to quantization of a 32 kHz timer.
+     * This can be done safely because afterwards cnt is divided by SymbolsPerSlot anyway. */
+    uint32_t cnt = platform->getSymbolCounter() - lkb + PRE_EVENT_SHIFT + (getMAC_PIB().helper.getSymbolsPerSlot() / 2);
 
     // calculate slot position
     uint16_t slotsSinceLastKnownBeaconIntervalStart = cnt / getMAC_PIB().helper.getSymbolsPerSlot();
