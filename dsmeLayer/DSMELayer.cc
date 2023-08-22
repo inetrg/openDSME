@@ -358,7 +358,7 @@ bool DSMELayer::isWithinTimeSlot(uint32_t now, uint16_t duration) {
          * something is completely wrong :)
          * This effectively means, that no matter at what point in time this check
          * is performed, the packet will not (never ever) fit into the effective slot time. */
-        LOG_ERROR("Slot only has %lu symbols but TX would take %u\n", slotDuration, duration);
+        LOG_DEBUG("Slot only has " <<  slotDuration " symbols but TX would take " << duration);
         DSME_ASSERT(false);
       }
     }
