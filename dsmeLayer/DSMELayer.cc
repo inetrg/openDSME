@@ -347,7 +347,19 @@ bool DSMELayer::isWithinTimeSlot(uint32_t now, uint16_t duration) {
     LOG_DEBUG("Checking isWithingTimeSlot: slot start time (" << timeSlotStart << ") <= current time (" << now << ") <= duration ("
         << now+duration << ") <= slot end time (" << timeSlotEnd << ")");
 
-    return now + duration <= timeSlotEnd;
+    bool fits = (now + duration) <= timeSlotEnd;
+    if (!fits) {
+      uint32_t slotDuration = timeSlotEnd - timeSlotStart;
+      if (duration > slotDuration) {
+        /* If you get this message you need to check all timing configurations because
+         * something is completely wrong :)
+         * This effectively means, that no matter at what point in time this check
+         * is performed, the packet will not (never ever) fit into the effective slot time. */
+        LOG_ERROR("Slot only has %lu symbols but TX would take %u\n", slotDuration, duration);
+        DSME_ASSERT(false);
+      }
+    }
+    return fits;
 }
 
 void DSMELayer::startTrackingBeacons() {
