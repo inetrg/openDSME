@@ -84,6 +84,10 @@ public:
 
     bool isScanning() const;
 
+    bool isSynced() const {
+        return _isSynced;
+    }
+
     void startScanPassive(uint16_t scanDuration, const channelList_t& scanChannels);
 
     /**
@@ -119,6 +123,7 @@ protected:
 
     bool isBeaconAllocationSent;
     bool isBeaconAllocated;
+    bool _isSynced;
 
     uint32_t lastKnownBeaconIntervalStart;
 

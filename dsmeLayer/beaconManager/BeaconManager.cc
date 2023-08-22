@@ -74,6 +74,7 @@ BeaconManager::BeaconManager(DSMELayer& dsme)
       isBeaconAllocationSent(false),
       isBeaconAllocated(false),
       lastKnownBeaconIntervalStart(0),
+      _isSynced(false),
 
       numBeaconCollision(0),
       missedBeacons(0),
@@ -512,6 +513,9 @@ void BeaconManager::handleBeacon(IDSMEMessage* msg) {
         params.beaconType = msg->getHeader().isEnhancedBeacon();
 
         this->dsme.getMAC_PIB().macPanCoordinatorBsn = params.ebsn;
+        if (this->dsme.isTrackingBeacons()) {
+          this->_isSynced = true;
+        }
         this->dsme.getMLME_SAP().getBEACON_NOTIFY().notify_indication(params);
     }
 
@@ -643,6 +647,7 @@ void BeaconManager::handleStartOfCFP(uint16_t currentSuperframe, uint16_t curren
             params.keyIdMode = 0;
             params.keySource = nullptr;
             params.keyIndex = 0;
+            this->_isSynced = false;
 
             this->dsme.stopTrackingBeacons();
 
