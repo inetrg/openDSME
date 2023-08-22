@@ -81,6 +81,11 @@ public:
      */
     bool sendInCAP(IDSMEMessage* msg);
 
+    /*! Indicate data to the upper layer.
+     *
+     * \param msg The message containing the data
+     */
+    void createDataIndication(IDSMEMessage* msg);
 
     inline NeighborQueue<MAX_NEIGHBORS>& getNeighborQueue() {
         return neighborQueue;
@@ -143,12 +148,14 @@ public:
      */
     void sendDoneGTS(enum AckLayerResponse response, IDSMEMessage* msg);
 
-    /*! This shall be called to receive a message after it has been decoupled from
+    /**
+     * TODO: this should be relocated to the entity actually responsible for GTS
+     * This shall be called to receive a message after it has been decoupled from
      * the ISR control flow.
      *
      * \param msg The message to received
      */
-    void receive(IDSMEMessage* msg);
+    void onReceive(IDSMEMessage* msg);
 
 /* Event handlers (END) ------------------------------------------------------*/
 
@@ -191,8 +198,6 @@ protected:
      *\return true if the transmission is attempted, false otherwise.
      */
     bool sendPreparedMessage();
-
-    void createDataIndication(IDSMEMessage* msg);
 
     /*! Finalizes the current GTS. Turns off the transceiver if transmitting,
      *  resets the neighbor associated with the time slot and ensures there

@@ -80,6 +80,14 @@ public:
     void preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMultiSuperframe, uint32_t nextSlotTime);
     void superframeEvent(int32_t lateness, uint32_t currentSlotTime);
 
+    /**
+     * This shall be called to hand over received messages which are intended
+     * for the BeaconManager after they have been decoupled from the ISR control flow.
+     *
+     * \param msg The received message
+     */
+    void onReceive(IDSMEMessage* msg);
+
     void handleBeacon(IDSMEMessage* msg);
 
     bool isScanning() const;

@@ -176,6 +176,25 @@ void BeaconManager::superframeEvent(int32_t lateness, uint32_t currentSlotTime) 
     }
 }
 
+void BeaconManager::onReceive(IDSMEMessage* msg) {
+    IEEE802154eMACHeader macHdr = msg->getHeader();
+
+    switch(macHdr.getFrameType()) {
+        case IEEE802154eMACHeader::FrameType::BEACON: {
+            LOG_INFO("BEACON from " << macHdr.getSrcAddr().getShortAddress() << " " << macHdr.getSrcPANId() << " " << dsme.getCurrentSuperframe() << ".");
+            this->dsme.getBeaconManager().handleBeacon(msg);
+            this->dsme.getPlatform().releaseMessage(msg);
+            break;
+        }
+
+        default: {
+            LOG_ERROR((uint16_t)macHdr.getFrameType());
+            dsme.getPlatform().releaseMessage(msg);
+        }
+    }
+    return;
+}
+
 void BeaconManager::prepareEnhancedBeacon(uint32_t nextSlotTime) {
     DSME_ASSERT(!transmissionPending);
     IDSMEMessage* msg = dsme.getPlatform().getEmptyMessage();

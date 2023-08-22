@@ -77,6 +77,14 @@ public:
     void setSlottedCSMA(bool slotted);
     void setBLE(bool ble);
 
+    /**
+     * This shall be called to handover received messages which are intended
+     * for the CAPLayer after they have been decoupled from the ISR control flow.
+     *
+     * \param msg The received message
+     */
+    void onReceive(IDSMEMessage* msg);
+
 private:
     /**
      * States
