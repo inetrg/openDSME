@@ -375,6 +375,11 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
                 }
             }
 
+            if((this->currentACTElement->getState() == VALID) && (this->currentACTElement->getDirection() == Direction::TX)) {
+                if (prepareNextMessageIfAny()) {
+                    this->msg_preloaded_already = this->dsme.getAckLayer().prepareSendingCopy(this->preparedMsg, this->doneGTS);
+                }
+            }
         } else {
             /* '-> nothing to do during this slot */
             DSME_ASSERT(this->currentACTElement == act.end());
@@ -446,34 +451,19 @@ bool MessageDispatcher::handleIFSEvent(int32_t lateness) {
 
 
 void MessageDispatcher::handleGTS(int32_t lateness) {
+
     if(this->currentACTElement != this->dsme.getMAC_PIB().macDSMEACT.end() && this->currentACTElement->getSuperframeID() == this->dsme.getCurrentSuperframe() &&
        this->currentACTElement->getGTSlotID() ==
            this->dsme.getCurrentSlot() - (this->dsme.getMAC_PIB().helper.getFinalCAPSlot(dsme.getCurrentSuperframe()) + 1)) {
         /* '-> this slot matches the prepared ACT element */
-
         if(this->currentACTElement->getDirection() == RX) { // also if INVALID or UNCONFIRMED!
             /* '-> a message may be received during this slot */
 
         } else if(this->currentACTElement->getState() == VALID) {
             /* '-> if any messages are queued for this link, send one */
 
-            DSME_ASSERT(this->lastSendGTSNeighbor == this->neighborQueue.end());
+            bool success = this->msg_preloaded_already || prepareNextMessageIfAny();
 
-            IEEE802154MacAddress adr = IEEE802154MacAddress(this->currentACTElement->getAddress());
-            this->lastSendGTSNeighbor = this->neighborQueue.findByAddress(IEEE802154MacAddress(this->currentACTElement->getAddress()));
-            if(this->lastSendGTSNeighbor == this->neighborQueue.end()) {
-                /* '-> the neighbor associated with the current slot does not exist */
-
-                LOG_ERROR("neighborQueue.size: " << ((uint8_t) this->neighborQueue.getNumNeighbors()));
-                LOG_ERROR("neighbor address: " << HEXOUT << adr.a1() << ":" << adr.a2() << ":" << adr.a3() << ":" << adr.a4() << DECOUT);
-                for(auto it : this->neighborQueue) {
-                    LOG_ERROR("neighbor address: " << HEXOUT << it.address.a1() << ":" << it.address.a2() << ":" << it.address.a3() << ":" << it.address.a4()
-                                                   << DECOUT);
-                }
-                DSME_ASSERT(false);
-            }
-
-            bool success = prepareNextMessageIfAny();
             LOG_DEBUG(success);
             if(success) {
                 /* '-> a message is queued for transmission */
@@ -513,35 +503,21 @@ void MessageDispatcher::handleGTSFrame(IDSMEMessage* msg) {
 //                2. If there exits any message in the queue to transmit.
 //          False otherwise
 bool MessageDispatcher::prepareNextMessageIfAny() {
-    bool result = false;
-    bool checkTimeToSendMessage = false;
-
-    // check if there exists a pending Message
     if(this->preparedMsg) {
-        checkTimeToSendMessage = true; // if true, set a flag to to check if pending message can be sent in remaining slot time
-    } else if (this->neighborQueue.isQueueEmpty(this->lastSendGTSNeighbor)) {  // there is no pending message, then check if the queue is empty (i.e. there is not any message to transmit to a target neighbor)
-        this->preparedMsg = nullptr; // reset value of pending Message
-        checkTimeToSendMessage = false;
-        result = false;
-    } else { // if there is a message to send retrieve a copy of it from the queue and set the flag to check if possible to send the message
-        checkTimeToSendMessage = true;
-        this->preparedMsg = neighborQueue.front(this->lastSendGTSNeighbor);
-    }
+        // a message was prepared before
+        return true;
+    } else {
+        IEEE802154MacAddress adr = IEEE802154MacAddress(this->currentACTElement->getAddress());
+        this->lastSendGTSNeighbor = this->neighborQueue.findByAddress(IEEE802154MacAddress(this->currentACTElement->getAddress()));
 
-    if(checkTimeToSendMessage) {//if the timming for transmission must be checked
-        // determined how long the transmission of the preparedMessage will take.
-        uint8_t ifsSymbols = this->preparedMsg->getTotalSymbols() <= aMaxSIFSFrameSize ? const_redefines::macSIFSPeriod : const_redefines::macLIFSPeriod;
-        uint32_t duration = this->preparedMsg->getTotalSymbols() + this->dsme.getMAC_PIB().helper.getAckWaitDuration() + ifsSymbols;
-        // check if the remaining slot time is enough to transmit the prepared packet
-        if(!this->dsme.isWithinTimeSlot(this->dsme.getPlatform().getSymbolCounter(), duration)) {
-            LOG_DEBUG("No packet prepared (remaining slot time insufficient)");
-            this->preparedMsg = nullptr; // reset value of pending Message
-            result = false; // there is no enough time, no transmission will take place
-        } else {
-            result = true; // there is time, then proceed
+        // there is no pending message, then check if the queue is empty (i.e. there is not any message to transmit to a target neighbor)
+        // if there is a message to send retrieve a copy of it from the queue and set the flag to check if possible to send the message
+        this->preparedMsg = this->neighborQueue.front(this->lastSendGTSNeighbor);
+        if (this->preparedMsg == NULL) {
+            return false;
         }
+        return true;
     }
-    return result;
 }
 
 bool MessageDispatcher::sendPreparedMessage() {
@@ -551,10 +527,18 @@ bool MessageDispatcher::sendPreparedMessage() {
     uint8_t ifsSymbols = this->preparedMsg->getTotalSymbols() <= aMaxSIFSFrameSize ? const_redefines::macSIFSPeriod : const_redefines::macLIFSPeriod;
     uint32_t duration = this->preparedMsg->getTotalSymbols() + this->dsme.getMAC_PIB().helper.getAckWaitDuration() + ifsSymbols;
     /* '-> Duration for the transmission of the next frame */
-
     if(this->dsme.isWithinTimeSlot(this->dsme.getPlatform().getSymbolCounter(), duration)) {
         /* '-> Sufficient time to send message in remaining slot time */
-        if (this->dsme.getAckLayer().prepareSendingCopy(this->preparedMsg, this->doneGTS)) {
+        if (this->msg_preloaded_already) {
+            /* -> Message was already loaded to the radio before.
+             * Reset the preload flag if the preloaded frame was sent out
+             * *and* also when the preloaded frame could not be sent at all.
+             * Required as the preloaded frame will most likely be overwritten
+             * during any following RX/TX. */
+            this->msg_preloaded_already = false;
+            this->dsme.getAckLayer().sendNowIfPending();
+            this->numTxGtsFrames++;
+        } else if (this->dsme.getAckLayer().prepareSendingCopy(this->preparedMsg, this->doneGTS)) {
             /* '-> Message transmission can be attempted */
             this->dsme.getAckLayer().sendNowIfPending();
             this->numTxGtsFrames++;

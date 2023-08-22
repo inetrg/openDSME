@@ -172,6 +172,8 @@ protected:
 
     IDSMEMessage *preparedMsg{nullptr};
 
+    bool msg_preloaded_already = false;
+
     /*!
      * Called on start of every GTSlot.
      * Switch channel for reception or transmit from queue in allocated slots. TODO: correct?
