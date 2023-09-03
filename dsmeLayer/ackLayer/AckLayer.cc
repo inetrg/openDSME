@@ -294,6 +294,9 @@ fsmReturnStatus AckLayer::stateIdle(AckEvent& event) {
                 }
                 return FSM_HANDLED;
             }
+            DSME_ATOMIC_BLOCK {
+                this->busy = true;
+            }
 
             // according to 5.2.1.1.4, the ACK shall be sent anyway even with broadcast address, but this can not work for GTS replies (where the AR bit has to
             // be set 5.3.11.5.2)
@@ -305,9 +308,6 @@ fsmReturnStatus AckLayer::stateIdle(AckEvent& event) {
                 pendingMessage = dsme.getPlatform().getEmptyMessage();
                 if(pendingMessage == nullptr) {
                     DSME_ASSERT(false);
-                    DSME_ATOMIC_BLOCK {
-                        this->busy = false;
-                    }
                     return FSM_HANDLED;
                 }
 
