@@ -92,6 +92,11 @@ void CAPLayer::dispatchCCAResult(bool success) {
 void CAPLayer::onReceive(IDSMEMessage* msg) {
     IEEE802154eMACHeader macHdr = msg->getHeader();
 
+    /* get ready to receive more frames ASAP */
+    if (dsme.getPlatform().isReceptionFromAckLayerPossible()) {
+        dsme.getPlatform().turnTransceiverToRX();
+    }
+
     switch(macHdr.getFrameType()) {
         case IEEE802154eMACHeader::FrameType::COMMAND: {
             MACCommand cmd;
@@ -224,11 +229,15 @@ fsmReturnStatus CAPLayer::stateIdle(CSMAEvent& event) {
         totalNBs = 0;
         CW = CW0;
 
-        dsme.getPlatform().turnTransceiverToRX();
 
         if(!queue.empty()) {
             return transition(&CAPLayer::stateBackoff);
         } else {
+            /* guard this to ensure the transition is not triggered
+             * if the Platform is currently busy with TX */
+            if (dsme.getPlatform().isReceptionFromAckLayerPossible()) {
+                dsme.getPlatform().turnTransceiverToRX();
+            }
             return FSM_HANDLED;
         }
     } else if(event.signal == CSMAEvent::MSG_PUSHED) {
@@ -254,6 +263,10 @@ fsmReturnStatus CAPLayer::stateIdle(CSMAEvent& event) {
 
 fsmReturnStatus CAPLayer::stateBackoff(CSMAEvent& event) {
     if(event.signal == CSMAEvent::ENTRY_SIGNAL) {
+        /* only switch transceiver to RX if it is currently not busy */
+        if (dsme.getPlatform().isReceptionFromAckLayerPossible()) {
+            dsme.getPlatform().turnTransceiverToRX();
+        }
         actionStartBackoffTimer();
         return FSM_HANDLED;
     } else if(event.signal == CSMAEvent::MSG_PUSHED) {
@@ -287,6 +300,8 @@ fsmReturnStatus CAPLayer::stateCCA(CSMAEvent& event) {
     } else if(event.signal == CSMAEvent::MSG_PUSHED) {
         return FSM_IGNORED;
     } else if(event.signal == CSMAEvent::CCA_FAILURE) {
+        /* CCA failed -> don't transmit now, go back to RX */
+        dsme.getPlatform().turnTransceiverToRX();
         failedCCAs++;
         return choiceRebackoff();
     } else if(event.signal == CSMAEvent::CCA_SUCCESS) {
