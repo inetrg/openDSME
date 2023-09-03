@@ -94,6 +94,8 @@ private:
 
     void checkAndDeallocateSingeleGTS(uint16_t address);
 
+    void checkAndDeallocateMultiGTS(uint16_t address, uint8_t num);
+
     GTS getContiguousFreeGTS();
 
     GTS getRandomFreeGTS();

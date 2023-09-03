@@ -120,7 +120,11 @@ void GTSHelper::performSchedulingAction(GTSSchedulingDecision decision) {
     if(decision.managementType == ManagementType::ALLOCATION) {
         checkAndAllocateGTS(decision);
     } else if(decision.managementType == ManagementType::DEALLOCATION) {
-        checkAndDeallocateSingeleGTS(decision.deviceAddress);
+        if (decision.numSlot == 1) {
+            checkAndDeallocateSingeleGTS(decision.deviceAddress);
+        } else {
+            checkAndDeallocateMultiGTS(decision.deviceAddress, decision.numSlot);
+        }
     } else {
         DSME_ASSERT(false);
     }
@@ -206,6 +210,57 @@ void GTSHelper::checkAndDeallocateSingeleGTS(uint16_t address) {
 
         sendDeallocationRequest(toDeallocate->getAddress(), toDeallocate->getDirection(), dsmeSABSpecification);
     }
+}
+
+void GTSHelper::checkAndDeallocateMultiGTS(uint16_t address, uint8_t num) {
+    /* first, get the allocation with the highest idle count */
+    DSMEAllocationCounterTable& act = this->dsmeAdaptionLayer.getMAC_PIB().macDSMEACT;
+    int16_t highestIdleCounter = -1;
+    DSMEAllocationCounterTable::iterator oldest = act.end();
+
+    uint8_t cnt = 0;
+
+    for(auto it = act.begin(); it != act.end(); ++it) {
+        if(it->getDirection() == Direction::TX && it->getAddress() == address) {
+            if(it->getState() == ACTState::VALID && it->getIdleCounter() > highestIdleCounter) {
+                highestIdleCounter = it->getIdleCounter();
+                oldest = it;
+            }
+        }
+    }
+
+    if(oldest != act.end()) {
+        DSMESABSpecification dsmeSABSpecification;
+        uint8_t subBlockLengthBytes = this->dsmeAdaptionLayer.getMAC_PIB().helper.getSubBlockLengthBytes(oldest->getSuperframeID());
+        dsmeSABSpecification.setSubBlockLengthBytes(subBlockLengthBytes);
+        dsmeSABSpecification.setSubBlockIndex(oldest->getSuperframeID());
+        dsmeSABSpecification.getSubBlock().fill(false);
+
+        dsmeSABSpecification.getSubBlock().set(
+                oldest->getGTSlotID() * this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumChannels()
+                + oldest->getChannel(), true);
+        cnt++;
+        /* add as many as can be found in the same superframe */
+        for(auto it = act.begin(); it != act.end(); ++it) {
+            if(it->getDirection() == Direction::TX && it->getAddress() == address) {
+                if(it->getState() == ACTState::VALID) {
+                    if (it != oldest && it->getSuperframeID() == oldest->getSuperframeID()) {
+                        dsmeSABSpecification.getSubBlock().set(
+                                it->getGTSlotID() * this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumChannels()
+                                + it->getChannel(), true);
+                        cnt++;
+                        if (cnt == num) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        sendDeallocationRequest(oldest->getAddress(), oldest->getDirection(), dsmeSABSpecification);
+    }
+
+
 }
 
 void GTSHelper::handleCOMM_STATUS_indication(mlme_sap::COMM_STATUS_indication_parameters& params) {
