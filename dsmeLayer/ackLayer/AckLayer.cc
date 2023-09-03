@@ -245,6 +245,7 @@ fsmReturnStatus AckLayer::catchAll(AckEvent& event) {
         case AckEvent::EXIT_SIGNAL:
             return FSM_IGNORED;
         default:
+            printf("cA %s %s\n", stateToString(this->getState()), AckEvent::eventToString(event));
             DSME_ASSERT(false);
             return FSM_IGNORED;
     }
