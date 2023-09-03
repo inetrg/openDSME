@@ -326,6 +326,12 @@ fsmReturnStatus CAPLayer::stateContention(CSMAEvent& event) {
     uint32_t timerEndTime = now;
 
     if(event.signal == CSMAEvent::ENTRY_SIGNAL) {
+        if(this->dsme.getMAC_PIB().macIsPANCoord) {
+            DBG_PIN_CLEAR(LA_PIN_COORD_CCA);
+        } else {
+            DBG_PIN_CLEAR(LA_PIN_RFD_CCA);
+        }
+
         if(CW > 0) {
             timerEndTime -= symbolsSinceCapFrameStart % aUnitBackoffPeriod;
             timerEndTime += aUnitBackoffPeriod;
@@ -427,6 +433,15 @@ void CAPLayer::setBLE(bool ble) {
 }
 
 void CAPLayer::actionStartBackoffTimer() {
+
+    if(this->dsme.getMAC_PIB().macIsPANCoord) {
+        DBG_PIN_SET(LA_PIN_COORD_CCA);
+        DBG_PIN_CLEAR(LA_PIN_COORD_CCA);
+    } else {
+        DBG_PIN_SET(LA_PIN_RFD_CCA);
+        DBG_PIN_CLEAR(LA_PIN_RFD_CCA);
+    }
+
     totalNBs++;
 
     uint8_t backoffExp;
