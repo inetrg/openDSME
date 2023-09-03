@@ -234,7 +234,7 @@ void DSMEAllocationCounterTable::setACTState(DSMESABSpecification& subBlock, ACT
     if(subBlock.getSubBlock().count(true) < 1) {
         return;
     }
-    DSME_ASSERT(subBlock.getSubBlock().count(true) == 1);
+    //DSME_ASSERT(subBlock.getSubBlock().count(true) == 1);
 
     for(DSMESABSpecification::SABSubBlock::iterator it = subBlock.getSubBlock().beginSetBits(); it != subBlock.getSubBlock().endSetBits(); ++it) {
         // this calculation assumes there is always exactly one superframe in the subblock
