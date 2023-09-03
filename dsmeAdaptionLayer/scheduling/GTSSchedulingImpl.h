@@ -147,8 +147,9 @@ public:
 
             return GTSSchedulingDecision{address, ManagementType::ALLOCATION, Direction::TX, 1, randomSuperframeID, randomSlotID};
         } else if(target < numAllocatedSlots && numAllocatedSlots > 1) {
+            uint8_t dealloc_num = numAllocatedSlots - target;
             /* TODO: slot and superframe ID are currently ignored for DEALLOCATION */
-            return GTSSchedulingDecision{address, ManagementType::DEALLOCATION, Direction::TX, 1, 0, 0};
+            return GTSSchedulingDecision{address, ManagementType::DEALLOCATION, Direction::TX, dealloc_num, 0, 0};
         } else {
             return NO_SCHEDULING_ACTION;
         }
