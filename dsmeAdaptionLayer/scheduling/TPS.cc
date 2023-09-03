@@ -109,8 +109,14 @@ void TPS::multisuperframeEvent() {
         //PSDU = MHR + MACPayload + MFR;
         uint8_t packets_per_slot = 1;
         if(useMultiplePacketsPerGTS) {
-            packets_per_slot = (this->dsmeAdaptionLayer.getMAC_PIB().helper.getSymbolsPerSlot() - PRE_EVENT_SHIFT) / ((6 + 127)*2 + this->dsmeAdaptionLayer.getMAC_PIB().helper.getAckWaitDuration() + const_redefines::macLIFSPeriod);
-                /* '-> calculate number of packets per slot with assumption of maximum packet size and maximum acknowledgement wait duration -> THIS CAN BE DONE MUCH BETTER */
+            /* -> calculate number of packets per slot with assumption of maximum packet size and maximum acknowledgement wait duration.
+             *    Using the actual packet sizes instead of a pessimistic worst case could fir more packets. */
+            uint16_t symsPerPacket = ((6 + 127)*2 + this->dsmeAdaptionLayer.getMAC_PIB().helper.getAckWaitDuration());
+            /* leftover symbols after the first packet */
+            int16_t symsLeft = (this->dsmeAdaptionLayer.getMAC_PIB().helper.getSymbolsPerSlot() - PRE_EVENT_SHIFT) - symsPerPacket;
+            DSME_ASSERT(symsLeft >= 0);
+            /* number of additional packets (and IFS required before each packet) that can fit into the remaining part of the slot */
+            packets_per_slot += symsLeft / (const_redefines::macLIFSPeriod + symsPerPacket);
         }
 
         LOG_DEBUG("Packets per slot: " << (int)packets_per_slot);
@@ -130,6 +136,10 @@ void TPS::multisuperframeEvent() {
         }
 
         data.slotTarget = slots + change;
+        /* ensure the target wont be negative */
+        if(data.slotTarget < 0) {
+            data.slotTarget = 0;
+        }
         LOG_DEBUG("TPS target: " << data.slotTarget);
 
         if(data.messagesInLastMultisuperframe == 0) {
