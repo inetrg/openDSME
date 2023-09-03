@@ -351,6 +351,11 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
     if(nextSlot > this->dsme.getMAC_PIB().helper.getFinalCAPSlot(nextSuperframe)) {
         /* '-> next slot will be GTS */
         if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
+            if(this->dsme.getMAC_PIB().macIsPANCoord) {
+                DBG_PIN_CLEAR(LA_PIN_COORD_UPDT_DLGT_BCN_CAP_CFP);
+            } else {
+                DBG_PIN_CLEAR(LA_PIN_RFD_UPDT_DLGT_BCN_CAP_CFP);
+            }
             this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&MessageDispatcher::onReceive, *this));
         }
 
@@ -401,6 +406,11 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
                 && this->dsme.getPlatform().isRxEnabledOnCap()) {
             /* '-> active CAP slot */
             if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
+                if(this->dsme.getMAC_PIB().macIsPANCoord) {
+                    DBG_PIN_SET(LA_PIN_COORD_UPDT_DLGT_BCN_CAP_CFP);
+                } else {
+                    DBG_PIN_SET(LA_PIN_RFD_UPDT_DLGT_BCN_CAP_CFP);
+                }
                 this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&CAPLayer::onReceive, this->dsme.getCapLayer()));
             }
             this->dsme.getPlatform().turnTransceiverOn();
