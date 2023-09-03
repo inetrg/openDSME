@@ -207,6 +207,7 @@ void GTSHelper::checkAndDeallocateSingeleGTS(uint16_t address) {
         dsmeSABSpecification.getSubBlock().fill(false);
         dsmeSABSpecification.getSubBlock().set(
             toDeallocate->getGTSlotID() * this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumChannels() + toDeallocate->getChannel(), true);
+        puts("CADS");
 
         sendDeallocationRequest(toDeallocate->getAddress(), toDeallocate->getDirection(), dsmeSABSpecification);
     }
@@ -257,6 +258,7 @@ void GTSHelper::checkAndDeallocateMultiGTS(uint16_t address, uint8_t num) {
             }
         }
 
+        puts("CADM");
         sendDeallocationRequest(oldest->getAddress(), oldest->getDirection(), dsmeSABSpecification);
     }
 
@@ -405,7 +407,8 @@ const char* printStatus(GTSStatus::GTS_Status status) {
         case GTSStatus::NO_SHORT_ADDRESS:
             return "NO_SHORT_ADDRESS";
         case GTSStatus::TRANSACTION_OVERFLOW:
-            return "TRANSACTION_OVERFLOW";
+            //return "TRANSACTION_OVERFLOW";
+            return "TOF";
     }
 
     DSME_ASSERT(false);
@@ -430,15 +433,19 @@ void GTSHelper::handleDSME_GTS_confirm(mlme_sap::DSME_GTS_confirm_parameters& pa
         gtsConfirmPending = false;
         if(params.status == GTSStatus::SUCCESS) {
             //TODO
+            //puts("GCS");
         } else if((params.status == GTSStatus::NO_DATA) ||
                   (params.status == GTSStatus::NO_ACK)) {
+            //puts("GCN");
             // assume the device is no longer reachable
             this->dsmeAdaptionLayer.getMAC_PIB().macDSMEACT.setACTState(params.dsmeSabSpecification, ACTState::REMOVED,
                                                                         params.direction, params.deviceAddress, 0, false, false);
         } else if (params.status == GTSStatus::CHANNEL_ACCESS_FAILURE) {
             //TODO
+            //puts("GCF");
         } else {
             //TODO
+            //printf("GC %s\n", printStatus(params.status));
         }
         if(params.status != GTSStatus::TRANSACTION_OVERFLOW) {
             //TODO
