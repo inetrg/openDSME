@@ -341,10 +341,20 @@ void GTSHelper::handleDSME_GTS_indication(mlme_sap::DSME_GTS_indication_paramete
             // DSME_ASSERT(!gtsConfirmPending);
 
             // TODO is this required?
-            // this->dsmeAdaptionLayer.getMAC_PIB().macDSMEACT.setACTState(params.dsmeSABSpecification, DEALLOCATED);
-
-            sendDeallocationRequest(params.deviceAddress, params.direction, params.dsmeSabSpecification);
+            //this->dsmeAdaptionLayer.getMAC_PIB().macDSMEACT.setACTState(params.dsmeSABSpecification, DEALLOCATED);
+            {
+            bool send_dealloc = false;
+            DSME_ATOMIC_BLOCK {
+                if(!gtsConfirmPending) {
+                    send_dealloc = true;
+                    gtsConfirmPending = true;
+                }
+            }
+            if (send_dealloc) {
+                sendDeallocationRequest(params.deviceAddress, params.direction, params.dsmeSabSpecification);
+            }
             sendReply = false;
+            }
             break;
         default:
             DSME_ASSERT(false);
