@@ -66,6 +66,53 @@ void AckLayer::reset() {
     DSME_ASSERT(dispatchSuccessful);
 }
 
+const char* AckEvent::eventToString(AckEvent event) {
+    switch(event.signal) {
+        case AckEvent::PREPARE_SEND_REQUEST:
+            return "REPARE_SEND_REQUEST";
+        case AckEvent::START_TRANSMISSION:
+            return "START_TRANSMISSION";
+        case AckEvent::ABORT_TRANSMISSION:
+            return "ABORT_TRANSMISSION";
+        case AckEvent::RECEIVE_REQUEST:
+            return "RECEIVE_REQUEST";
+        case AckEvent::SEND_DONE:
+            return "SEND_DONE";
+        case AckEvent::TIMER_FIRED:
+            return "TIMER_FIRED";
+        case AckEvent::ACK_RECEIVED:
+            return "ACK_RECEIVED";
+        case AckEvent::RESET:
+            return "RESET";
+        default:
+            return "!INVALID!";
+    }
+}
+
+const char* AckLayer::stateToString(AckLayer::state_t state) {
+    if (state == &AckLayer::stateIdle) {
+        return "Idle";
+    }
+    if (state == &AckLayer::statePreparingTx) {
+        return "PTx";
+    }
+    if (state == &AckLayer::stateTx) {
+        return "Tx";
+    }
+    if (state == &AckLayer::stateWaitForAck) {
+        return "WfA";
+    }
+    if (state == &AckLayer::stateTxAck) {
+        return "TxAck";
+    }
+    if (state == &AckLayer::stateAbort) {
+        return "Abort";
+    } else {
+        DSME_ASSERT(false);
+        return nullptr;
+    }
+}
+
 bool AckLayer::prepareSendingCopy(IDSMEMessage* msg, done_callback_t doneCallback) {
     DSME_ATOMIC_BLOCK {
         if(this->busy) {

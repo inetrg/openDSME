@@ -79,6 +79,8 @@ public:
         RESET
     };
 
+    static const char* eventToString(AckEvent event);
+
     bool success;   // only valid for SEND_DONE
     uint8_t seqNum; // only valid for ACK_RECEIVED
 };
@@ -129,6 +131,8 @@ private:
     const Delegate<void(bool)> internalDoneCallback;
 
     void signalResult(enum AckLayerResponse response);
+
+    static const char* stateToString(AckLayer::state_t state);
 };
 } /* namespace dsme */
 
