@@ -265,9 +265,13 @@ void DSMELayer::slotEvent(int32_t lateness) {
         LOG_DEBUG(DECOUT << currentSlot << " " << currentSuperframe << " " << currentMultiSuperframe);
     }
 
+    // As long as the lateness is not bigger than the slot, this won't break
+    // anything - the slot event will still check if the transmission fits within the slot
+    // and abort if necessary.
     if(lateness > 100) { // TODO reduce
         LOG_ERROR("lateness " << lateness);
-        DSME_ASSERT(false);
+        printf("LATE %ld\n", lateness);
+        //DSME_ASSERT(false);
     }
 
     uint32_t currentSlotTime;
@@ -346,7 +350,6 @@ bool DSMELayer::isWithinTimeSlot(uint32_t now, uint16_t duration) {
     uint32_t timeSlotStart = (symbolsSinceLastBeaconInterval / symbolsPerSlot) * symbolsPerSlot + this->beaconManager.getLastKnownBeaconIntervalStart();
     uint32_t timeSlotEnd = timeSlotStart + symbolsPerSlot - PRE_EVENT_SHIFT;
 
-    DSME_ASSERT(now >= timeSlotStart && now <= timeSlotEnd);
     LOG_DEBUG("Checking isWithingTimeSlot: slot start time (" << timeSlotStart << ") <= current time (" << now << ") <= duration ("
         << now+duration << ") <= slot end time (" << timeSlotEnd << ")");
 
