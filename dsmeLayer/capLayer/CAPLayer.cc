@@ -333,10 +333,16 @@ fsmReturnStatus CAPLayer::stateContention(CSMAEvent& event) {
         }
 
         if(CW > 0) {
-            timerEndTime -= symbolsSinceCapFrameStart % aUnitBackoffPeriod;
-            timerEndTime += aUnitBackoffPeriod;
-            this->dsme.getEventDispatcher().setupCSMATimer(timerEndTime);
-            return FSM_HANDLED;
+            //timerEndTime -= symbolsSinceCapFrameStart % aUnitBackoffPeriod;
+            //timerEndTime += aUnitBackoffPeriod;
+            //this->dsme.getEventDispatcher().setupCSMATimer(timerEndTime);
+            //return FSM_HANDLED;
+            //TODO: avoid blocking here, and determine the actually needed timeout dynamically
+            //This is currently needed because otherwise the multiple CCA attempts
+            //move into other backoff unit slots.
+            ztimer_sleep(ZTIMER_USEC, 320 - 290);
+            CW--;
+            return transition(&CAPLayer::stateCCA);
         }
         else {
             return transition(&CAPLayer::stateSending);
@@ -454,15 +460,17 @@ void CAPLayer::actionStartBackoffTimer() {
     
     const uint8_t maxBE = this->dsme.getMAC_PIB().macMaxBE;
     backoffExp = backoffExp <= maxBE ? backoffExp : maxBE;
-
     const uint16_t unitBackoffPeriods = this->dsme.getPlatform().getRandom() % (1 << (uint16_t)backoffExp);
 
+    //      aUnitBackoffPeriod = aTurnaroundTime + aCcaTime
+    // <=>  20                 = 12              + 8
     const uint16_t backoff = aUnitBackoffPeriod * (unitBackoffPeriods + 1); // +1 to avoid scheduling in the past
     const uint32_t symbolsPerSlot = this->dsme.getMAC_PIB().helper.getSymbolsPerSlot();
     const uint16_t blockedEnd = symbolsRequired() + PRE_EVENT_SHIFT;
     const uint32_t capPhaseLength = dsme.getMAC_PIB().helper.getFinalCAPSlot(0) * symbolsPerSlot;
     const uint32_t usableCapPhaseLength = capPhaseLength - blockedEnd;
-    const uint32_t usableCapPhaseEnd = usableCapPhaseLength + symbolsPerSlot;
+    /* Ensure the usable CAP end is pessimistic enough to not transmit till CFP/Beacon starts again */
+    const uint32_t usableCapPhaseEnd = usableCapPhaseLength - symbolsPerSlot / 2;
     
 
     DSME_ATOMIC_BLOCK {
