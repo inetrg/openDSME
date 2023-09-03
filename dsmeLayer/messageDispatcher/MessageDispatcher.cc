@@ -137,11 +137,13 @@ void MessageDispatcher::sendDoneGTS(enum AckLayerResponse response, IDSMEMessage
         // not successful -> retry?
         if(msg->getRetryCounter() < dsme.getMAC_PIB().macMaxFrameRetries) {
             msg->increaseRetryCounter();
-            //finalizeGTSTransmission();
+            finalizeGTSTransmission();
             LOG_DEBUG("sendDoneGTS - retry");
             return; // will stay at front of queue
         }
     }
+
+    transceiverOffIfAssociated();
 
     if(response == AckLayerResponse::ACK_FAILED || response == AckLayerResponse::ACK_SUCCESSFUL) {
         this->dsme.getPlatform().signalAckedTransmissionResult(response == AckLayerResponse::ACK_SUCCESSFUL, msg->getRetryCounter() + 1, msg->getHeader().getDestAddr());
@@ -201,7 +203,6 @@ void MessageDispatcher::sendDoneGTS(enum AckLayerResponse response, IDSMEMessage
 
 void MessageDispatcher::finalizeGTSTransmission() {
     LOG_DEBUG("Finalizing transmission for " << this->currentACTElement->getGTSlotID() << " " << this->currentACTElement->getSuperframeID() << " " << this->currentACTElement->getChannel());
-    transceiverOffIfAssociated();
     if(this->multiplePacketsPerGTS) {
         this->dsme.getEventDispatcher().stopIFSTimer();
     }
