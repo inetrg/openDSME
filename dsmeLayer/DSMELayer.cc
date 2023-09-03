@@ -350,6 +350,12 @@ bool DSMELayer::isWithinTimeSlot(uint32_t now, uint16_t duration) {
     uint32_t timeSlotStart = (symbolsSinceLastBeaconInterval / symbolsPerSlot) * symbolsPerSlot + this->beaconManager.getLastKnownBeaconIntervalStart();
     uint32_t timeSlotEnd = timeSlotStart + symbolsPerSlot - PRE_EVENT_SHIFT;
 
+    //TODO: Check if this can  be enabled again.
+    //      removed the assert for now because it also triggers if now falls into the
+    //      PRE_EVENT_SHIFT part, even though, the below 'fits' check would still correctly determine
+    //      that the packet wont fit into the slot anymore.
+    //
+    //DSME_ASSERT(now >= timeSlotStart && now <= timeSlotEnd);
     LOG_DEBUG("Checking isWithingTimeSlot: slot start time (" << timeSlotStart << ") <= current time (" << now << ") <= duration ("
         << now+duration << ") <= slot end time (" << timeSlotEnd << ")");
 
