@@ -125,7 +125,11 @@ void MessageDispatcher::sendDoneGTS(enum AckLayerResponse response, IDSMEMessage
     DSMEAllocationCounterTable& act = this->dsme.getMAC_PIB().macDSMEACT;
     DSME_ASSERT(this->currentACTElement != act.end());
 
-    this->dsme.getEventDispatcher().setupIFSTimer(msg->getTotalSymbols() > aMaxSIFSFrameSize);
+    if(this->multiplePacketsPerGTS) {
+        //TODO: setting up the IFS timer only makes sense when there actually is
+        //      enough time left for another transmission in the current slot
+        this->dsme.getEventDispatcher().setupIFSTimer(msg->getTotalSymbols() > aMaxSIFSFrameSize);
+    }
 
     if(response != AckLayerResponse::NO_ACK_REQUESTED && response != AckLayerResponse::ACK_SUCCESSFUL) {
         currentACTElement->incrementIdleCounter();
@@ -198,7 +202,9 @@ void MessageDispatcher::sendDoneGTS(enum AckLayerResponse response, IDSMEMessage
 void MessageDispatcher::finalizeGTSTransmission() {
     LOG_DEBUG("Finalizing transmission for " << this->currentACTElement->getGTSlotID() << " " << this->currentACTElement->getSuperframeID() << " " << this->currentACTElement->getChannel());
     transceiverOffIfAssociated();
-    this->dsme.getEventDispatcher().stopIFSTimer();
+    if(this->multiplePacketsPerGTS) {
+        this->dsme.getEventDispatcher().stopIFSTimer();
+    }
     this->preparedMsg = nullptr;    // TODO correct here?
     this->lastSendGTSNeighbor = this->neighborQueue.end();
     this->currentACTElement = this->dsme.getMAC_PIB().macDSMEACT.end();
@@ -436,6 +442,9 @@ bool MessageDispatcher::handleSlotEvent(uint8_t slot, uint8_t superframe, int32_
 }
 
 bool MessageDispatcher::handleIFSEvent(int32_t lateness) {
+    /* this callback shall only be called if the (non-standard) feature for
+     * multiple packet transmissions per GTS is enabled */
+    assert(this->multiplePacketsPerGTS);
     /* Neighbor and slot have to be valid at this point */
     DSME_ASSERT(this->lastSendGTSNeighbor != this->neighborQueue.end());
     DSME_ASSERT(this->currentACTElement != this->dsme.getMAC_PIB().macDSMEACT.end());
