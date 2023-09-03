@@ -108,18 +108,14 @@ protected:
     template <T E>
     inline void _startTimer(uint32_t nextEventSymbolCounter, handler_t handler) {
         this->history.addEvent(nextEventSymbolCounter, E);
+        this->symbols_until[E] = nextEventSymbolCounter - this->lastDispatchSymbolCounter;
 
-        if(nextEventSymbolCounter <= this->currentDispatchSymbolCounter) {
-            /* '-> an event was scheduled too far in the past */
-            uint32_t now = _NOW;
-            (void) now;
-            LOG_ERROR("now:" << now << ", nextEvent: " << nextEventSymbolCounter << ", lastDispatch: " << this->lastDispatchSymbolCounter << ", Event "
-                             << (uint16_t)E);
-            history.printEvents();
+        /* As the symbol counter is operated in a way that gracefully handles wraparounds,
+         * it is not possible to detect invalid values by checking for nextEventCounter <= currentEventCounter.
+         * Instead we assume the timer will never be used for very long timeouts and use that to detect underruns. */
+        if (this->symbols_until[E] > (UINT32_MAX / 2)) {
             DSME_ASSERT(false);
         }
-
-        this->symbols_until[E] = nextEventSymbolCounter - this->lastDispatchSymbolCounter;
         this->handlers[E] = handler;
         return;
     }
