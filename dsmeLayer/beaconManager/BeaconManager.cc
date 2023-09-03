@@ -146,6 +146,17 @@ void BeaconManager::reset() {
 void BeaconManager::preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMultiSuperframe, uint32_t startSlotTime) {
     uint16_t nextSDIndex = nextSuperframe + this->dsme.getMAC_PIB().helper.getNumberSuperframesPerMultiSuperframe() * nextMultiSuperframe;
 
+    if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
+        if (this->dsme.getMAC_PIB().macIsPANCoord) {
+          DBG_PIN_SET(LA_PIN_COORD_UPDT_DLGT_BCN_CAP_CFP);
+          DBG_PIN_CLEAR(LA_PIN_COORD_UPDT_DLGT_BCN_CAP_CFP);
+        } else {
+          DBG_PIN_SET(LA_PIN_RFD_UPDT_DLGT_BCN_CAP_CFP);
+          DBG_PIN_CLEAR(LA_PIN_RFD_UPDT_DLGT_BCN_CAP_CFP);
+        }
+        this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&BeaconManager::onReceive, this->dsme.getBeaconManager()));
+    }
+
     if((this->isBeaconAllocated || this->dsme.getMAC_PIB().macIsPANCoord) && nextSDIndex == this->dsmePANDescriptor.getBeaconBitmap().getSDIndex()) {
         // This node will transmit a beacon
         this->dsme.getPlatform().turnTransceiverOn();
@@ -155,9 +166,6 @@ void BeaconManager::preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMul
         /* This node expects a beacon, only if not associated or a beacon from the SYNC-parent is expected.
          * Update the receive delegate accordingly.
          */
-        if (this->dsme.getMAC_PIB().macIsPANCoord || this->dsme.getBeaconManager().isSynced()) {
-            this->dsme.getPlatform().setReceiveDelegate(DELEGATE(&BeaconManager::onReceive, this->dsme.getBeaconManager()));
-        }
         this->dsme.getPlatform().turnTransceiverOn();
         this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
         this->dsme.getPlatform().turnTransceiverToRX();
