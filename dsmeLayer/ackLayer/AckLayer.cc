@@ -116,6 +116,8 @@ const char* AckLayer::stateToString(AckLayer::state_t state) {
 bool AckLayer::prepareSendingCopy(IDSMEMessage* msg, done_callback_t doneCallback) {
     DSME_ATOMIC_BLOCK {
         if(this->busy) {
+            const char *snm = stateToString(this->getState());
+            printf("ALB %s\n", snm);
             return false;
         } else {
             this->busy = true;
