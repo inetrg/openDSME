@@ -426,6 +426,23 @@ void GTSHelper::handleDSME_GTS_confirm(mlme_sap::DSME_GTS_confirm_parameters& pa
         if(params.status != GTSStatus::TRANSACTION_OVERFLOW) {
             performSchedulingAction(this->gtsScheduling->getNextSchedulingAction());
         }
+    } else if(params.managementType == ManagementType::DEALLOCATION) {
+        gtsConfirmPending = false;
+        if(params.status == GTSStatus::SUCCESS) {
+            //TODO
+        } else if((params.status == GTSStatus::NO_DATA) ||
+                  (params.status == GTSStatus::NO_ACK)) {
+            // assume the device is no longer reachable
+            this->dsmeAdaptionLayer.getMAC_PIB().macDSMEACT.setACTState(params.dsmeSabSpecification, ACTState::REMOVED,
+                                                                        params.direction, params.deviceAddress, 0, false, false);
+        } else if (params.status == GTSStatus::CHANNEL_ACCESS_FAILURE) {
+            //TODO
+        } else {
+            //TODO
+        }
+        if(params.status != GTSStatus::TRANSACTION_OVERFLOW) {
+            //TODO
+        }
     }
     return;
 }
