@@ -180,6 +180,7 @@ void BeaconManager::superframeEvent(int32_t lateness, uint32_t currentSlotTime) 
         if(lateness > 10) {
             dsme.getAckLayer().abortPreparedTransmission();
             LOG_ERROR("Beacon aborted");
+            puts("BA");
         } else {
             dsme.getAckLayer().sendNowIfPending();
         }
@@ -670,6 +671,9 @@ void BeaconManager::handleStartOfCFP(uint16_t currentSuperframe, uint16_t curren
     if(this->dsme.isTrackingBeacons() && currentMultiSuperframe == 0 && currentSuperframe == 0) {
         /* Increment the number of missed beacons. This gets reset whenever a beacon is received */
         ++(this->missedBeacons);
+        if(this->missedBeacons > 1) {
+          printf("MB %d\n", this->missedBeacons);
+        }
         if(this->missedBeacons > aMaxLostBeacons) {
             mlme_sap::SYNC_LOSS_indication_parameters params;
             MAC_PIB& mac_pip = this->dsme.getMAC_PIB();
