@@ -572,6 +572,12 @@ bool MessageDispatcher::sendPreparedMessage() {
             sendDoneGTS(AckLayerResponse::SEND_FAILED, this->preparedMsg);
         }
         return true;
+    } else {
+        /* if a message was preloaded it must be abortet here to prevent preparing another one */
+        if (this->msg_preloaded_already) {
+            dsme.getAckLayer().abortPreparedTransmission();
+            this->msg_preloaded_already = false;
+        }
     }
     LOG_DEBUG("No packet sent (remaining slot time insufficient)");
     return false;
