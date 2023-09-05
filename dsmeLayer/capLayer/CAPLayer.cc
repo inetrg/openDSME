@@ -54,6 +54,7 @@
 #include "../DSMELayer.h"
 #include "../messageDispatcher/MessageDispatcher.h"
 #include "../messages/MACCommand.h"
+#include "pm_layered.h"
 
 namespace dsme {
 
@@ -337,10 +338,13 @@ fsmReturnStatus CAPLayer::stateContention(CSMAEvent& event) {
             //timerEndTime += aUnitBackoffPeriod;
             //this->dsme.getEventDispatcher().setupCSMATimer(timerEndTime);
             //return FSM_HANDLED;
-            //TODO: avoid blocking here, and determine the actually needed timeout dynamically
+            //TODO: block unblock within ztimer usec automatically
+            pm_block(1);
+            //TODO: avoid blocking sleep here, and determine the actually needed timeout dynamically
             //This is currently needed because otherwise the multiple CCA attempts
             //move into other backoff unit slots.
             ztimer_sleep(ZTIMER_USEC, 320 - 290);
+            pm_unblock(1);
             CW--;
             return transition(&CAPLayer::stateCCA);
         }
