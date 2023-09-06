@@ -215,6 +215,15 @@ uint8_t DSMELayer::getSkippableSlots(uint16_t currentSlot, uint16_t currentSuper
     /* whith slot minimization, identify which is the next slot that requires action
      * and skip all slots till then */
     DSMEAllocationCounterTable& act = getMAC_PIB().macDSMEACT;
+
+    /* if the current slot event is an allocated GTS the next slot event
+     * has to be active at least to turn off the radio again. */
+    if (currentSlot > getMAC_PIB().helper.getFinalCAPSlot(currentSuperframe)) {
+      unsigned gtsid = currentSlot - getMAC_PIB().helper.getFinalCAPSlot(currentSuperframe) - 1;
+      if (act.isAllocated(currentSuperframe, gtsid)) {
+        return 0;
+      }
+    }
     uint8_t offset = 1;
     unsigned SFperMSF = getMAC_PIB().helper.getNumberSuperframesPerMultiSuperframe();
     /* iterate over all upcoming slots till we find one that requires action */
