@@ -309,8 +309,8 @@ void DSMELayer::slotEvent(int32_t lateness) {
     if(currentSlot == 0) {
 #ifdef EVAL_DSME_MSF_DMM_INSTRUMENTATION
         if (_msf_instr_enabled && (currentSuperframe == 0)) {
-            /* DMM Indication is only done on the RFD, and only if synced */
-            if (!getMAC_PIB().macIsPANCoord && getBeaconManager().isSynced()) {
+            /* DMM Indication is only done on the RFD, and only if associated */
+            if (!getMAC_PIB().macIsPANCoord && getMAC_PIB().macAssociatedPANCoord) {
                 if (!_first_msf_notified) {
                     NOTIFY_START_TO_DMM;
                     _first_msf_notified = true;
