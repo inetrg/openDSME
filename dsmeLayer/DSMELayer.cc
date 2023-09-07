@@ -51,6 +51,14 @@
 #include "../mac_services/pib/PIBHelper.h"
 #include "../mac_services/pib/dsme_mac_constants.h"
 
+#ifdef EVAL_DSME_MSF_DMM_INSTRUMENTATION
+#include "eval_utils.h"
+extern bool _msf_instr_enabled;
+extern bool _first_msf_notified;
+extern bool _last_msf_notified;
+extern uint32_t _msf_to_measure_count;
+#endif
+
 namespace dsme {
 
 DSMELayer::DSMELayer()
@@ -299,6 +307,24 @@ void DSMELayer::slotEvent(int32_t lateness) {
 
     /* handle slot */
     if(currentSlot == 0) {
+#ifdef EVAL_DSME_MSF_DMM_INSTRUMENTATION
+        if (_msf_instr_enabled && (currentSuperframe == 0)) {
+            /* DMM Indication is only done on the RFD, and only if synced */
+            if (!getMAC_PIB().macIsPANCoord && getBeaconManager().isSynced()) {
+                if (!_first_msf_notified) {
+                    NOTIFY_START_TO_DMM;
+                    _first_msf_notified = true;
+                } else if (!_last_msf_notified) {
+                    _msf_to_measure_count--;
+                    if (_msf_to_measure_count == 0) {
+                      NOTIFY_STOP_TO_DMM;
+                      _last_msf_notified = true;
+                    }
+                }
+            }
+        }
+#endif /* EVAL_DSME_MSF_DMM_INSTRUMENTATION */
+
         beaconManager.superframeEvent(lateness, currentSlotTime);
     }
 
