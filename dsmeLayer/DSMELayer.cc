@@ -53,10 +53,12 @@
 
 #ifdef EVAL_DSME_MSF_DMM_INSTRUMENTATION
 #include "eval_utils.h"
+extern bool _sync_lock_instr_enabled;
 extern bool _msf_instr_enabled;
 extern bool _first_msf_notified;
 extern bool _last_msf_notified;
 extern uint32_t _msf_to_measure_count;
+extern mutex_t dsme_associated_lock;
 #endif
 
 namespace dsme {
@@ -322,6 +324,9 @@ void DSMELayer::slotEvent(int32_t lateness) {
                     }
                 }
             }
+        }
+        if (_sync_lock_instr_enabled && (currentSuperframe == 0) && !getMAC_PIB().macIsPANCoord && getMAC_PIB().macAssociatedPANCoord) {
+            mutex_unlock(&dsme_associated_lock);
         }
 #endif /* EVAL_DSME_MSF_DMM_INSTRUMENTATION */
 
