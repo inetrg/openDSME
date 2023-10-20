@@ -327,12 +327,6 @@ fsmReturnStatus CAPLayer::stateContention(CSMAEvent& event) {
     uint32_t timerEndTime = now;
 
     if(event.signal == CSMAEvent::ENTRY_SIGNAL) {
-        if(this->dsme.getMAC_PIB().macIsPANCoord) {
-            DBG_PIN_CLEAR(LA_PIN_COORD_CCA);
-        } else {
-            DBG_PIN_CLEAR(LA_PIN_RFD_CCA);
-        }
-
         if(CW > 0) {
             //timerEndTime -= symbolsSinceCapFrameStart % aUnitBackoffPeriod;
             //timerEndTime += aUnitBackoffPeriod;
