@@ -178,7 +178,7 @@ void BeaconManager::preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMul
 void BeaconManager::superframeEvent(int32_t lateness, uint32_t currentSlotTime) {
     if(transmissionPending) {
         //if(lateness > 1) {
-        if(lateness > 10) {
+        if(lateness > 20) {
             dsme.getAckLayer().abortPreparedTransmission();
             LOG_ERROR("Beacon aborted");
             puts("BA");
