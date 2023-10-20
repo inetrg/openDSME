@@ -238,6 +238,9 @@ void BeaconManager::prepareEnhancedBeacon(uint32_t nextSlotTime) {
     } else {
         LOG_DEBUG("Beacon sent");
         transmissionPending = true;
+        if(msg->getHeader().hasSequenceNumber()) {
+          this->dsme.getMAC_PIB().macPanCoordinatorBsn = msg->getHeader().getSequenceNumber();
+        }
     }
 
     return;
