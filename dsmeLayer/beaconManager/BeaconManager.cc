@@ -167,6 +167,7 @@ void BeaconManager::preSuperframeEvent(uint16_t nextSuperframe, uint16_t nextMul
          * Update the receive delegate accordingly.
          */
         this->dsme.getPlatform().turnTransceiverOn();
+        this->dsme.getPlatform().turnTransceiverToIdle();
         this->dsme.getPlatform().setChannelNumber(this->dsme.getPHY_PIB().phyCurrentChannel);
         this->dsme.getPlatform().turnTransceiverToRX();
     } else {
