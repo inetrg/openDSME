@@ -438,13 +438,12 @@ void CAPLayer::setBLE(bool ble) {
 
 void CAPLayer::actionStartBackoffTimer() {
 
-    if(this->dsme.getMAC_PIB().macIsPANCoord) {
-        DBG_PIN_SET(LA_PIN_COORD_CCA);
-        DBG_PIN_CLEAR(LA_PIN_COORD_CCA);
-    } else {
-        DBG_PIN_SET(LA_PIN_RFD_CCA);
-        DBG_PIN_CLEAR(LA_PIN_RFD_CCA);
+#ifdef EVAL_DSME_MSF_DMM_INSTRUMENTATION
+    if (_cfp_start_lock_instr_enabled) {
+      mutex_unlock(&dsme_cfp_start_lock);
+      _cfp_start_lock_instr_enabled = false;
     }
+#endif
 
     totalNBs++;
 
