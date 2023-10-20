@@ -583,6 +583,9 @@ bool MessageDispatcher::sendPreparedMessage() {
             dsme.getAckLayer().abortPreparedTransmission();
             this->msg_preloaded_already = false;
         }
+
+        DBG_PIN_SET(LA_PIN_RFD_UPDT_DLGT_BCN_CAP_CFP);
+        DBG_PIN_CLEAR(LA_PIN_RFD_UPDT_DLGT_BCN_CAP_CFP);
     }
     LOG_DEBUG("No packet sent (remaining slot time insufficient)");
     return false;
