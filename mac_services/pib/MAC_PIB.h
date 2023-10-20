@@ -135,7 +135,7 @@ public:
     uint8_t macMaxCSMABackoffs{4};
 
     /** The maximum number of retries allowed after a transmission failure. */
-    uint8_t macMaxFrameRetries{3};
+    uint8_t macMaxFrameRetries{0};
 
     /** The minimum value of the backoff exponent (BE) in the CSMA-CA algorithm, as described in 6.2.5.1. */
     uint8_t macMinBE{3};
