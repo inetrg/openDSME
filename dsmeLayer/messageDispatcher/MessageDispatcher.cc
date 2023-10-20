@@ -368,10 +368,10 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
             // For TX currentACTElement will be reset in finalizeGTSTransmission, called by
             // either handleGTS if nothing is to send or by sendDoneGTS.
             // For RX it is reset in the next handlePreSlotEvent.   TODO: is the reset actually required?
-            this->dsme.getPlatform().turnTransceiverOn();
 
             // For RX also if INVALID or UNCONFIRMED!
             if((this->currentACTElement->getState() == VALID) || (this->currentACTElement->getDirection() == Direction::RX)) {
+                this->dsme.getPlatform().turnTransceiverOn();
 
                 if(dsme.getMAC_PIB().macChannelDiversityMode == Channel_Diversity_Mode::CHANNEL_ADAPTATION) {
                     this->dsme.getPlatform().setChannelNumber(this->dsme.getMAC_PIB().helper.getChannels()[this->currentACTElement->getChannel()]);
@@ -390,6 +390,8 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
             if((this->currentACTElement->getState() == VALID) && (this->currentACTElement->getDirection() == Direction::TX)) {
                 if (prepareNextMessageIfAny()) {
                     this->msg_preloaded_already = this->dsme.getAckLayer().prepareSendingCopy(this->preparedMsg, this->doneGTS);
+                } else {
+                    this->dsme.getPlatform().turnTransceiverToIdle();
                 }
             }
         } else {
