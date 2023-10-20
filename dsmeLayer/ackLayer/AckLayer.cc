@@ -359,9 +359,12 @@ fsmReturnStatus AckLayer::statePreparingTx(AckEvent& event) {
         case AckEvent::RESET:
         case AckEvent::ABORT_TRANSMISSION:
             DSME_ASSERT(this->pendingMessage);
+            /* call this before signalling the result as the layer signalled the result to
+             * might turn off the radio, which asserts if there is still a frame pending.
+             * The frame pending flag is cleared in platform.abortPreparedTransmission */
+            dsme.getPlatform().abortPreparedTransmission();
             signalResult(SEND_ABORTED);
             pendingMessage = nullptr;
-            dsme.getPlatform().abortPreparedTransmission();
             return transition(&AckLayer::stateIdle);
 
         case AckEvent::SEND_DONE:
