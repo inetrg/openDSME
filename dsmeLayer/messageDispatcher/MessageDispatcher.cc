@@ -549,12 +549,15 @@ bool MessageDispatcher::prepareNextMessageIfAny() {
 
 bool MessageDispatcher::sendPreparedMessage() {
     DSME_ASSERT(this->preparedMsg);
-    DSME_ASSERT(this->dsme.getMAC_PIB().helper.getSymbolsPerSlot() >= this->preparedMsg->getTotalSymbols() + this->dsme.getMAC_PIB().helper.getAckWaitDuration() + 10 /* arbitrary processing delay */ + PRE_EVENT_SHIFT);
+    uint16_t tot_syms = this->preparedMsg->getTotalSymbols();
+    uint16_t awd = this->dsme.getMAC_PIB().helper.getAckWaitDuration();
+    uint32_t sc = this->dsme.getPlatform().getSymbolCounter();
+    DSME_ASSERT(this->dsme.getMAC_PIB().helper.getSymbolsPerSlot() >= tot_syms + awd + 10 /* arbitrary processing delay */ + PRE_EVENT_SHIFT);
 
-    uint8_t ifsSymbols = this->preparedMsg->getTotalSymbols() <= aMaxSIFSFrameSize ? const_redefines::macSIFSPeriod : const_redefines::macLIFSPeriod;
-    uint32_t duration = this->preparedMsg->getTotalSymbols() + this->dsme.getMAC_PIB().helper.getAckWaitDuration() + ifsSymbols;
+    uint8_t ifsSymbols = tot_syms <= aMaxSIFSFrameSize ? const_redefines::macSIFSPeriod : const_redefines::macLIFSPeriod;
+    uint32_t duration = tot_syms + awd;// + ifsSymbols ?;
     /* '-> Duration for the transmission of the next frame */
-    if(this->dsme.isWithinTimeSlot(this->dsme.getPlatform().getSymbolCounter(), duration)) {
+    if(this->dsme.isWithinTimeSlot(sc, duration)) {
         /* '-> Sufficient time to send message in remaining slot time */
         if (this->msg_preloaded_already) {
             /* -> Message was already loaded to the radio before.
