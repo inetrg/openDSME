@@ -677,7 +677,7 @@ void BeaconManager::handleStartOfCFP(uint16_t currentSuperframe, uint16_t curren
         /* Increment the number of missed beacons. This gets reset whenever a beacon is received */
         ++(this->missedBeacons);
         if(this->missedBeacons > 1) {
-          printf("MB %d\n", this->missedBeacons);
+          printf("M%d\n", this->missedBeacons);
         }
         if(this->missedBeacons > aMaxLostBeacons) {
             mlme_sap::SYNC_LOSS_indication_parameters params;
