@@ -432,7 +432,7 @@ bool MessageDispatcher::handlePreSlotEvent(uint8_t nextSlot, uint8_t nextSuperfr
 
 uint8_t MessageDispatcher::nextHoppingSequenceChannel(uint8_t nextSlot, uint8_t nextSuperframe, uint8_t nextMultiSuperframe) {
     uint16_t hoppingSequenceLength = this->dsme.getMAC_PIB().macHoppingSequenceLength;
-    uint8_t ebsn = 0; // this->dsme.getMAC_PIB().macPanCoordinatorBsn;    //TODO is this set correctly
+    uint8_t ebsn = this->dsme.getMAC_PIB().macPanCoordinatorBsn;
     uint16_t sdIndex = nextSuperframe + this->dsme.getMAC_PIB().helper.getNumberSuperframesPerMultiSuperframe() * nextMultiSuperframe;
     uint8_t numGTSlots = this->dsme.getMAC_PIB().helper.getNumGTSlots(sdIndex);
 
