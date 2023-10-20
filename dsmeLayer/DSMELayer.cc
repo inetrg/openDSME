@@ -59,6 +59,8 @@ extern bool _first_msf_notified;
 extern bool _last_msf_notified;
 extern uint32_t _msf_to_measure_count;
 extern mutex_t dsme_associated_lock;
+extern bool _cfp_start_lock_instr_enabled;
+extern mutex_t dsme_cfp_start_lock;
 #endif
 
 namespace dsme {
@@ -336,6 +338,10 @@ void DSMELayer::slotEvent(int32_t lateness) {
     messageDispatcher.handleSlotEvent(currentSlot, currentSuperframe, lateness);
 
     if(currentSlot == getMAC_PIB().helper.getFinalCAPSlot(currentSuperframe) + 1) {
+        if (_cfp_start_lock_instr_enabled) {
+          mutex_unlock(&dsme_cfp_start_lock);
+          _cfp_start_lock_instr_enabled = false;
+        }
         platform->scheduleStartOfCFP();
     }
 }
