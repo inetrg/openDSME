@@ -317,9 +317,6 @@ fsmReturnStatus AckLayer::stateIdle(AckEvent& event) {
                 ackHeader.setFrameType(IEEE802154eMACHeader::ACKNOWLEDGEMENT);
                 ackHeader.setSequenceNumber(receivedMessage->getHeader().getSequenceNumber());
 
-                ackHeader.setDstAddr(receivedMessage->getHeader().getSrcAddr()); // TODO remove, this is only for the sequence diagram
-
-                dsme.getPlatform().turnTransceiverToIdle();
                 /* platform has to handle delaying the ACK to obey aTurnaroundTime */
                 bool success = dsme.getPlatform().sendDelayedAck(pendingMessage, receivedMessage, internalDoneCallback);
 
